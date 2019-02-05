@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/Notification"
+            android:icon="@drawable/ic_notifications"
+            android:title="Notification"
+            app:actionViewClass="android.widget.TextView"
+            />
+        <item
+            android:id="@+id/freindrequestlist"
+            android:icon="@drawable/ic_friend_request"
+            android:title="Friend request" />
+
+        <item
+            android:id="@+id/friend"
+            android:icon="@drawable/ic_friend"
+            android:title="Friends" />
+        <item
+            android:id="@+id/Album"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="Album" />
+        <item
+            android:id="@+id/nav_message"
+            android:icon="@drawable/ic_email"
+            android:title="Message" />
+        <item
+            android:id="@+id/nav_setting"
+            android:icon="@drawable/ic_settings"
+            android:title="Setting" />
+        <item
+            android:id="@+id/nav_applemusic"
+            android:icon="@drawable/amicon"
+            android:title="Apple Music" />
+
+    </group>
+
+
+    <item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/logout"
+                android:icon="@drawable/ic_powe"
+                android:title="Logout" />
+
+        </menu>
+    </item>
+
+</menu>

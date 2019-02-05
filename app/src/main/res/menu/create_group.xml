@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:appcompat="http://schemas.android.com/apk/res-auto"
+    >
+
+    <item
+        android:id="@+id/CreateGroup"
+        android:title="Create Group"
+        android:icon="@drawable/create_group"
+        appcompat:showAsAction="ifRoom|collapseActionView"/>
+
+</menu>

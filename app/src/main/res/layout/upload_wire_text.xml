@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    card_view:cardCornerRadius="7dp"
+    android:layout_marginTop="@dimen/activity_horizontal_margin"
+    android:layout_marginRight="4dp"
+    android:layout_marginLeft="4dp"
+    >
+    <TextView
+        android:layout_marginTop="@dimen/cardview_compat_inset_shadow"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:id="@+id/text_uopload"
+        android:paddingTop="14dp"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:background="@drawable/edt_rounded_corner"
+        android:text="Wire something that's on your mind!"
+        android:textSize="15dp"/>
+
+</RelativeLayout>

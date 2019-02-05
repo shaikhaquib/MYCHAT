@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+
+    <!--
+        Recived Message LayOut
+    -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:visibility="gone"
+        android:id="@+id/recive_chat_bubble"
+        android:layout_marginRight="80dp"
+        android:orientation="horizontal">
+        <ImageView
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/grey_node" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/left_node_bg"
+            >
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:background="@drawable/edt_rounded_corner"
+                            android:id="@+id/rec_thumb"
+                            android:visibility="gone"
+                            android:elevation="@dimen/activity_horizontal_margin"
+                            android:padding="4dp">
+
+                            <ImageView
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:id="@+id/rec_preimg"/>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:layout_marginLeft="8dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textSize="13dp"
+                                    android:textColor="#FFBEBABA"
+                                    android:maxLines="1"
+                                    android:id="@+id/rec_preTitle"
+                                    />
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:maxLines="2"
+                                    android:textSize="10dp"
+                                    android:textColor="#d9d5d5"
+                                    android:id="@+id/rec_preDesc"
+                                    />
+
+
+                            </LinearLayout>
+
+
+                     </LinearLayout>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/recive_image"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="15dp"
+                android:padding="10dp"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:text="Hello"
+                android:id="@+id/recive_Text"/>
+
+                </LinearLayout>
+        </LinearLayout>
+
+    <!--
+        Send Message LayOut
+    -->
+    <LinearLayout
+        android:id="@+id/send_chat_bubble"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="80dp"
+        android:gravity="end"
+        android:orientation="horizontal">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="vertical"
+            android:background="@drawable/right_node_bg">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:background="@drawable/edt_rounded_corner"
+                            android:visibility="gone"
+                            android:id="@+id/send_thumb"
+                            android:elevation="@dimen/activity_horizontal_margin"
+                            android:padding="4dp">
+
+                            <ImageView
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:id="@+id/send_preimg"/>
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:layout_marginLeft="8dp">
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:textSize="13dp"
+                                            android:text="Heloo"
+                                            android:textColor="#cecbcb"
+                                            android:maxLines="2"
+                                            android:id="@+id/send_preTitle"
+                                            />
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:maxLines="2"
+                                        android:textSize="10dp"
+                                        android:textColor="#c2bfbf"
+                                        android:id="@+id/send_preDesc"
+                                        />
+
+
+                                </LinearLayout>
+
+
+                        </LinearLayout>
+
+
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/send_image"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="15dp"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:padding="10dp"
+                android:id="@+id/send_Text"/>
+            </LinearLayout>
+        <ImageView
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/purple_node_bg" />
+
+            </LinearLayout>
+
+
+<!--
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/in_message_bg"
+        android:id="@+id/newbubble"
+        android:layout_gravity="right"
+        android:visibility="gone"
+        android:layout_marginLeft="50dp"
+        android:orientation="vertical">
+
+        &lt;!&ndash;<ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/send_image"/>&ndash;&gt;
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:textSize="15dp"
+            android:text="Hello"
+            android:id="@+id/new_send_Text"/>
+
+
+    </LinearLayout>
+-->
+
+
+
+
+</LinearLayout>

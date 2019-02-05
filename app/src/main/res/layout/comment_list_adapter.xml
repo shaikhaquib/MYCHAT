@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="4dp"
+    android:background="#fcd4c9"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorWhite"
+        android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:orientation="horizontal">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/comment_subject_profile"
+        android:layout_width="41dp"
+        android:layout_height="43dp"
+        android:layout_margin="8dp"
+        android:src="@drawable/ychat_logo" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/comment_subject_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rahul Mahadik"
+            android:layout_marginTop="4dp"
+            android:layout_marginLeft="8dp"
+            android:textColor="#FF000000"
+            android:textSize="15sp"
+            />
+
+
+
+            <TextView
+                android:id="@+id/comment_object"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:text="Pritam"
+                android:textColor="#b1aaaa"
+                android:textSize="15dp" />
+
+    </LinearLayout>
+        <TextView
+            android:id="@+id/comment_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3d ago"
+            android:textColor="#b1adab"
+            android:shadowColor="#d4d1d1"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"/>
+
+    </LinearLayout>
+        <View
+            android:id="@+id/view"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#e1e1dd" />
+        <TextView
+            android:id="@+id/comment_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="14dp"
+            android:textColor="#979292"
+            android:textSize="15dp"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="8dp"
+            >
+            <CheckBox
+            android:id="@+id/comment_like"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=" Like" android:layout_weight="1"
+            android:textSize="15dp"
+            android:textColor="@drawable/color_selector"
+            android:button="@drawable/on_like_click_selector"
+            />
+
+            <TextView
+                android:id="@+id/comment_like_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Likes"
+                android:textColor="#fd5405"
+                android:visibility="gone"
+                android:shadowColor="#d4d1d1"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</android.support.v7.widget.CardView>

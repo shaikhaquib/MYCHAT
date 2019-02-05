@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activitys.Comment">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="55dp"
+        app:layout_scrollFlags="scroll|enterAlways"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:scrollbars="vertical"
+        android:paddingBottom="50dp"
+        android:id="@+id/CommentList"/>
+
+    </LinearLayout>
+</ScrollView>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentBottom="true"
+            android:background="#f1e3dd"
+            >
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="5dp"
+                android:hint=" "
+                android:layout_weight="1">
+                <EditText
+                    android:id="@+id/commenttext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter Comment"
+                    android:textColorHint="#ffb175"
+                    android:scrollbars="vertical"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="5dp"
+                    android:background="@drawable/edt_rounded_corner"
+                    android:padding="10dp"
+                    android:maxLength="20000"
+                    android:maxLines="4"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:layout_gravity="center"
+                    android:fadeScrollbars="false"
+                    android:shadowColor="@color/black_overlay"
+                    />
+            </android.support.design.widget.TextInputLayout>
+            <ImageView
+                android:id="@+id/postcomment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_send"
+                android:layout_gravity="center"
+                android:layout_marginLeft="5dp"
+                />
+
+        </LinearLayout>
+</RelativeLayout>

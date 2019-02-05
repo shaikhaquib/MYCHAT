@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#ffffff"
+    >
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#ffffff"
+        android:id="@+id/member_layout"
+        >
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/member_dp"
+            android:layout_width="60dp"
+            android:layout_height="50dp"
+            android:layout_margin="7dp"
+            android:src="@drawable/ic_ishook" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            >
+
+            <TextView
+                android:id="@+id/member_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rahul Mahadik"
+                android:textColor="#616161"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Role"
+                android:id="@+id/role"
+                android:textColor="#939393" />
+
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/option_menu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_menu"
+            android:visibility="gone"
+            android:layout_gravity="center_vertical"/>
+    </LinearLayout>
+    <View
+        android:layout_width="250dp"
+        android:layout_height="1dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="4dp"
+        android:background="#efeded"/>
+
+</LinearLayout>

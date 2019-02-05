@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2.5"
+        android:background="@color/colorPrimary"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:layout_gravity="center_vertical|center"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/white_y"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="YCHAT CALL"
+                android:textSize="20sp"
+                android:textColor="@color/colorWhite"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/callerid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ychat Calling"
+            android:textSize="30sp"
+            android:gravity="center"
+            android:textColor="@color/colorWhite"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="CALLING"
+            android:textSize="@dimen/activity_horizontal_margin"
+            android:gravity="center"
+            android:textColor="@color/colorWhite"/>
+
+
+
+
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="7"
+        android:background="@color/colorWhite"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginStart="63dp"
+                android:layout_marginLeft="63dp"
+                android:layout_marginBottom="114dp"
+                app:srcCompat="@drawable/ic_decline" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginEnd="63dp"
+                android:layout_marginRight="63dp"
+                android:layout_marginBottom="114dp"
+                app:srcCompat="@drawable/ic_answer" />
+
+
+
+
+        </RelativeLayout>
+    </LinearLayout>
+
+</LinearLayout>

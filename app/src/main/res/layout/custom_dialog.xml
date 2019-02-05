@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_dialog"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:padding="10dp" >
+    <EditText
+        android:id="@+id/et_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/activity_horizontal_margin"
+        android:background="@drawable/border_third"
+        android:textColor="@color/colorWhite"
+        android:textColorHint="@color/colorWhite"
+        android:hint="Reason to report"
+        >
+
+        <requestFocus />
+    </EditText>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
+        android:gravity="center">
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cancel"
+        android:textColor="@color/colorWhite"
+        android:id="@+id/canceldialog"
+        android:background="@drawable/btn_roundedcorner"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Report"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:textColor="@color/colorWhite"
+        android:id="@+id/reportldialog"
+        android:visibility="gone"
+        android:background="@drawable/btn_roundedcorner"/></LinearLayout>
+</LinearLayout>

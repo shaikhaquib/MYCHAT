@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#d5d5d9"
+    android:id="@+id/upd_pro"
+    tools:context=".fragments.Update_ProfilePic"
+>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/activity_horizontal_margin">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginBottom="@dimen/activity_horizontal_margin"
+    >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="8dp"
+        android:paddingBottom="@dimen/activity_horizontal_margin"
+        android:background="@color/colorWhite">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:id="@+id/profile_pic"/>
+
+<RelativeLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignBottom="@+id/profile_pic"
+    android:layout_alignRight="@+id/profile_pic"
+    android:layout_alignEnd="@+id/profile_pic">
+            <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@color/colorPrimary"
+            android:layout_marginBottom="@dimen/activity_horizontal_margin"/>
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:id="@+id/open_gallery"
+            app:srcCompat="@drawable/ic_cam_fullwhite"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="11dp"
+            android:onClick="loadpicturefromGallery"/></RelativeLayout></RelativeLayout>
+
+    <LinearLayout
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
+        android:background="@color/colorWhite"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+           <TextView
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:layout_margin="@dimen/activity_horizontal_margin"
+               android:textSize="@dimen/activity_horizontal_margin"
+               android:text="Edit Account Details"/>
+            
+        </RelativeLayout>
+        
+      <android.support.design.widget.TextInputLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content" >
+
+          <AutoCompleteTextView
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:id="@+id/edfname"
+              android:hint="@string/prompt_firstname"/>
+      </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <AutoCompleteTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/edlname"
+                android:hint="@string/prompt_lastname"/>
+
+        </android.support.design.widget.TextInputLayout>
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <AutoCompleteTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/eduname"
+                android:hint="@string/prompt_Name"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <AutoCompleteTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/edemail"
+                android:hint="@string/prompt_email"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+       <RelativeLayout
+           android:layout_width="match_parent"
+           android:layout_margin="@dimen/activity_horizontal_margin"
+           android:layout_height="wrap_content">
+           <TextView
+               android:layout_width="match_parent"
+               android:layout_height="25dp"
+               android:text="Select Time Zone"
+               android:textSize="@dimen/activity_horizontal_margin"
+               android:textColor="#000"
+               android:paddingBottom="4dp"
+                android:id="@+id/tv_time"
+               android:layout_marginLeft="@dimen/activity_horizontal_margin"
+               android:layout_marginRight="@dimen/activity_horizontal_margin"
+               android:drawableRight="@drawable/ic_arrow"/>
+
+                <Spinner
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/time_zone"
+                    android:visibility="gone"
+                    android:spinnerMode="dialog"
+
+                    />
+
+       </RelativeLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#e1dede"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Select Country"
+                android:textSize="@dimen/activity_horizontal_margin"
+                android:textColor="#000"
+                android:id="@+id/tv_country"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:drawableRight="@drawable/ic_arrow"/>
+             <Spinner
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/country"
+                android:spinnerMode="dialog"
+                 android:visibility="gone"
+                 android:layout_marginBottom="@dimen/activity_horizontal_margin"
+                />
+        </RelativeLayout>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_roundedcorner"
+            android:id="@+id/submit_setting"
+            android:text="Save Setting"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginBottom="50dp"
+            android:textColor="@color/colorWhite"/>
+    </LinearLayout>
+
+
+</LinearLayout>
+</ScrollView>
+
+</RelativeLayout>

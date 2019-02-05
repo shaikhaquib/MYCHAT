@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="150dp"
+    android:layout_height="150dp"
+    android:layout_gravity="center_horizontal"
+    android:gravity="center"
+    android:layout_margin="@dimen/activity_horizontal_margin"
+    app:cardElevation="8dp"
+    android:background="@drawable/border_sec"
+    >
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_menu"
+        android:layout_gravity="end"
+        android:id="@+id/groupmenu"/>
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="150dp"
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center"
+       >
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/clique_layout"
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="4dp"
+        android:gravity="center">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:id="@+id/Clique_icon"
+
+            android:src="@drawable/ic_ishook"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:layout_marginTop="8dp"
+            android:id="@+id/Clique_name"
+            android:textStyle="bold"
+            android:text="Group Name"/>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#efeded"
+        android:visibility="gone"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorAccent"
+        android:textSize="17dp"
+        android:padding="8dp"
+        android:visibility="gone"
+        android:singleLine="true"
+        android:gravity="center"
+        android:text="View Member"
+        android:id="@+id/view_member"
+        /></LinearLayout>
+</android.support.v7.widget.CardView>

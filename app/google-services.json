@@ -1,0 +1,99 @@
+{
+  "project_info": {
+    "project_number": "356217672803",
+    "firebase_url": "https://voice-quickstart-android-6ed90.firebaseio.com",
+    "project_id": "voice-quickstart-android-6ed90",
+    "storage_bucket": "voice-quickstart-android-6ed90.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:356217672803:android:37573030bb743aa9",
+        "android_client_info": {
+          "package_name": "com.ishook.inc.ychat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "356217672803-hii06d7relo9ug3ks835h0tfgs22load.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ishook.inc.ychat",
+            "certificate_hash": "1d625e469e851e30d7278457141fa9a91f6d5166"
+          }
+        },
+        {
+          "client_id": "356217672803-uj0bricrl1f9m9mc8plq3gr0o0feit3v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCe6PEntBRuSylUzvqLv0Z1gR12cOIxV2o"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "356217672803-uj0bricrl1f9m9mc8plq3gr0o0feit3v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:356217672803:android:8fe5528108fa08f4",
+        "android_client_info": {
+          "package_name": "com.twilio.voice.quickstart"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "356217672803-8vf85jod2ftpr9om7s21cbqluv04p0l7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.twilio.voice.quickstart",
+            "certificate_hash": "337443c328c5da9892f034bf184ae5ac30e3ebd1"
+          }
+        },
+        {
+          "client_id": "356217672803-uj0bricrl1f9m9mc8plq3gr0o0feit3v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCe6PEntBRuSylUzvqLv0Z1gR12cOIxV2o"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "356217672803-uj0bricrl1f9m9mc8plq3gr0o0feit3v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
