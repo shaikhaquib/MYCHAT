@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/MYCHAT.iml" filepath="$PROJECT_DIR$/MYCHAT.iml" />
       <module fileurl="file://$PROJECT_DIR$/YoChat.iml" filepath="$PROJECT_DIR$/YoChat.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

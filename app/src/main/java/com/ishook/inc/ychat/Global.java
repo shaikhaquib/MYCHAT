@@ -7,6 +7,7 @@ public class Global {
     public static String accessToken = null;
     public static String frid = null;
     public static String frname = null;
+    public static int notificationId = 0;
     public static String HostName = "https://ishook.com/";
 
 

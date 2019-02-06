@@ -34,6 +34,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Chronometer;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -73,6 +74,7 @@ public class VoiceActivity extends AppCompatActivity {
 
     public static String freindid , freindname;
     private AudioManager audioManager;
+    FloatingActionButton floatingActionButton;
     private int savedAudioMode = AudioManager.MODE_INVALID;
 
     private boolean isReceiverRegistered = false;
@@ -80,14 +82,15 @@ public class VoiceActivity extends AppCompatActivity {
 
     // Empty HashMap, never populated for the Quickstart
     HashMap<String, String> twiMLParams = new HashMap<>();
-
-    private CoordinatorLayout coordinatorLayout;
-    private FloatingActionButton callActionFab;
+    TextView callerId;
+    private LinearLayout coordinatorLayout;
+    private LinearLayout incomingCall;
+  //  private FloatingActionButton callActionFab;
     private FloatingActionButton hangupActionFab;
     private FloatingActionButton muteActionFab;
     private Chronometer chronometer;
     private SoundPoolManager soundPoolManager;
-
+    TextView maincallerid;
     public static final String INCOMING_CALL_INVITE = "INCOMING_CALL_INVITE";
     public static final String INCOMING_CALL_NOTIFICATION_ID = "INCOMING_CALL_NOTIFICATION_ID";
     public static final String ACTION_INCOMING_CALL = "ACTION_INCOMING_CALL";
@@ -107,6 +110,7 @@ public class VoiceActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_voice);
 
+        getSupportActionBar().hide();
         SharedPreferences sharedPreferences =getSharedPreferences( getPackageName()+ Constants.PREF_FILE_NAME, Context.MODE_PRIVATE);
       //  sid = sharedPreferences.getString(Constants.KEY_SESSION, "N/A");
        // identity = sharedPreferences.getString(Constants.KEY_USERID, "N/A");
@@ -129,12 +133,19 @@ public class VoiceActivity extends AppCompatActivity {
 
 
         coordinatorLayout = findViewById(R.id.coordinator_layout);
-        callActionFab = findViewById(R.id.call_action_fab);
+        incomingCall = findViewById(R.id.incoming_call);
+        callerId = findViewById(R.id.callerid);
+      //  callActionFab = findViewById(R.id.call_action_fab);
         hangupActionFab = findViewById(R.id.hangup_action_fab);
         muteActionFab = findViewById(R.id.mute_action_fab);
         chronometer = findViewById(R.id.chronometer);
+        maincallerid = findViewById(R.id.maincallerid);
+        String[] call_name = freindname.split("-");
 
-        callActionFab.setOnClickListener(callActionFabClickListener());
+        maincallerid.setText(call_name[0]);
+        floatingActionButton = findViewById(R.id.speaker);
+
+        //callActionFab.setOnClickListener(callActionFabClickListener());
         hangupActionFab.setOnClickListener(hangupActionFabClickListener());
         muteActionFab.setOnClickListener(muteActionFabClickListener());
 
@@ -176,14 +187,29 @@ public class VoiceActivity extends AppCompatActivity {
         if (!checkPermissionForMicrophone()) {
             requestPermissionForMicrophone();
         } else {
-            retrieveAccessToken();
+          //  retrieveAccessToken();
         }
 
 
         if (!freindid.equals("")&&!freindname.equals("")){
-        alertDialog = createCallDialog(callClickListener(), cancelCallClickListener(), VoiceActivity.this);
-        alertDialog.show();  }else {
-            callActionFab.setVisibility(View.GONE);
+
+            if (Global.accessToken!=null && !Global.accessToken.isEmpty()){
+            //    EditText contact = (EditText) ((AlertDialog) dialog).findViewById(R.id.contact);
+                twiMLParams.put("to",freindname.replaceAll(" ","").toLowerCase());
+                activeCall = Voice.call(VoiceActivity.this, Global.accessToken, twiMLParams, callListener);
+                setCallUI();
+             //   alertDialog.dismiss();
+            }else {
+                Snackbar.make(coordinatorLayout,
+                        "Connection problem ! please Check your network connection or restart app...",
+                        SNACKBAR_DURATION).show();
+                finish();
+            }
+
+
+      /*  alertDialog = createCallDialog(callClickListener(), cancelCallClickListener(), VoiceActivity.this);
+        alertDialog.show(); */ }else {
+       //     callActionFab.setVisibility(View.GONE);
         }  }
 
     @Override
@@ -237,6 +263,8 @@ public class VoiceActivity extends AppCompatActivity {
                     String message = String.format("Call Error: %d, %s", error.getErrorCode(), error.getMessage());
                     Log.e(TAG, message);
                     Snackbar.make(coordinatorLayout, message, SNACKBAR_DURATION).show();
+                }else {
+                    Snackbar.make(coordinatorLayout, "Connection error", SNACKBAR_DURATION).show();
                 }
                 resetUI();
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
@@ -249,9 +277,10 @@ public class VoiceActivity extends AppCompatActivity {
      * The UI state when there is an active call
      */
     private void setCallUI() {
-        callActionFab.hide();
+       // callActionFab.hide();
         hangupActionFab.show();
         muteActionFab.show();
+        floatingActionButton.show();
         chronometer.setVisibility(View.VISIBLE);
         chronometer.setBase(SystemClock.elapsedRealtime());
         chronometer.start();
@@ -261,10 +290,11 @@ public class VoiceActivity extends AppCompatActivity {
      * Reset UI elements
      */
     private void resetUI() {
-        callActionFab.show();
+     //   callActionFab.show();
         muteActionFab.setImageDrawable(ContextCompat.getDrawable(VoiceActivity.this, R.drawable.ic_mic_white_24dp));
         muteActionFab.hide();
         hangupActionFab.hide();
+        floatingActionButton.hide();
         chronometer.setVisibility(View.INVISIBLE);
         chronometer.stop();
     }
@@ -288,26 +318,33 @@ public class VoiceActivity extends AppCompatActivity {
     }
 
     private void handleIncomingCallIntent(Intent intent) {
+
         if (intent != null && intent.getAction() != null) {
             if (intent.getAction().equals(ACTION_INCOMING_CALL)) {
                 activeCallInvite = intent.getParcelableExtra(INCOMING_CALL_INVITE);
                 if (activeCallInvite != null && (activeCallInvite.getState() == CallInvite.State.PENDING)) {
                     soundPoolManager.playRinging();
+/*
                     alertDialog = createIncomingCallDialog(VoiceActivity.this,
                             activeCallInvite,
                             answerCallClickListener(),
                             cancelCallClickListener());
                     alertDialog.show();
+*/
+                    CallInvite callInvite = null;
+                    coordinatorLayout.setVisibility(View.GONE);
+                    incomingCall.setVisibility(View.VISIBLE);
+                    callerId.setText(activeCallInvite.getFrom());
+                    maincallerid.setText(activeCallInvite.getFrom());
                     activeCallNotificationId = intent.getIntExtra(INCOMING_CALL_NOTIFICATION_ID, 0);
                 } else {
-                    if (alertDialog != null && alertDialog.isShowing()) {
                         soundPoolManager.stopRinging();
-                        alertDialog.cancel();
+                    //    alertDialog.cancel();
                         finish();
-                    }
+
                 }
             } else if (intent.getAction().equals(ACTION_FCM_TOKEN)) {
-                retrieveAccessToken();
+             //   retrieveAccessToken();
             }
         }
     }
@@ -327,6 +364,37 @@ public class VoiceActivity extends AppCompatActivity {
         if (isReceiverRegistered) {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(voiceBroadcastReceiver);
             isReceiverRegistered = false;
+        }
+    }
+
+    public void decline(View view) {
+        soundPoolManager.stopRinging();
+        if (activeCallInvite != null) {
+            activeCallInvite.reject(VoiceActivity.this);
+            notificationManager.cancel(activeCallNotificationId);
+        }
+       // alertDialog.dismiss();
+        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+        finish();
+
+    }
+
+    public void accept(View view) {
+        coordinatorLayout.setVisibility(View.VISIBLE);
+        soundPoolManager.stopRinging();
+        answer();
+        setCallUI();
+       // alertDialog.dismiss();
+    }
+
+    public void speaker(View view) {
+
+        if (audioManager.isSpeakerphoneOn()) {
+            audioManager.setSpeakerphoneOn(false);
+            floatingActionButton.setImageResource(R.drawable.ic_phonelink_ring_white_24dp);
+        } else {
+            audioManager.setSpeakerphoneOn(true);
+            floatingActionButton.setImageResource(R.drawable.ic_volume_up_white_24dp);
         }
     }
 
@@ -561,7 +629,7 @@ public class VoiceActivity extends AppCompatActivity {
                         "Microphone permissions needed. Please allow in your application settings.",
                         SNACKBAR_DURATION).show();
             } else {
-                retrieveAccessToken();
+             //  retrieveAccessToken();
             }
         }
     }
@@ -616,6 +684,7 @@ public class VoiceActivity extends AppCompatActivity {
     /*
      * Get an access token from your Twilio access token server
      */
+/*
     private void retrieveAccessToken() {
         Ion.with(this).load(TWILIO_ACCESS_TOKEN_SERVER_URL + "?identity=" + identity.replaceAll(" ","").toLowerCase()).asString().setCallback(new FutureCallback<String>() {
             @Override
@@ -632,4 +701,5 @@ public class VoiceActivity extends AppCompatActivity {
             }
         });
     }
+*/
 }
