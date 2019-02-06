@@ -140,7 +140,7 @@ public class VoiceActivity extends AppCompatActivity {
         muteActionFab = findViewById(R.id.mute_action_fab);
         chronometer = findViewById(R.id.chronometer);
         maincallerid = findViewById(R.id.maincallerid);
-        String[] call_name = freindname.split("-");
+        String[] call_name = freindname.split("_");
 
         maincallerid.setText(call_name[0]);
         floatingActionButton = findViewById(R.id.speaker);
