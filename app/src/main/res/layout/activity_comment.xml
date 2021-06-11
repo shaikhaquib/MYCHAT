@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="55dp"
@@ -32,7 +32,7 @@
             android:layout_alignParentBottom="true"
             android:background="#f1e3dd"
             >
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -57,7 +57,7 @@
                     android:fadeScrollbars="false"
                     android:shadowColor="@color/black_overlay"
                     />
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
             <ImageView
                 android:id="@+id/postcomment"
                 android:layout_width="wrap_content"

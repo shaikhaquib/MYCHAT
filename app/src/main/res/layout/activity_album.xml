@@ -7,7 +7,7 @@
     android:orientation="vertical"
     tools:context=".activitys.Album">
 
-   <android.support.v7.widget.RecyclerView
+   <androidx.recyclerview.widget.RecyclerView
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:layout_centerHorizontal="true"

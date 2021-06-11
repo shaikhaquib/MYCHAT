@@ -75,7 +75,7 @@
             
         </RelativeLayout>
         
-      <android.support.design.widget.TextInputLayout
+      <com.google.android.material.textfield.TextInputLayout
           android:layout_width="match_parent"
           android:layout_height="wrap_content" >
 
@@ -84,9 +84,9 @@
               android:layout_height="wrap_content"
               android:id="@+id/edfname"
               android:hint="@string/prompt_firstname"/>
-      </android.support.design.widget.TextInputLayout>
+      </com.google.android.material.textfield.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
 
@@ -96,8 +96,8 @@
                 android:id="@+id/edlname"
                 android:hint="@string/prompt_lastname"/>
 
-        </android.support.design.widget.TextInputLayout>
-        <android.support.design.widget.TextInputLayout
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
 
@@ -107,9 +107,9 @@
                 android:id="@+id/eduname"
                 android:hint="@string/prompt_Name"/>
 
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
 
@@ -119,7 +119,7 @@
                 android:id="@+id/edemail"
                 android:hint="@string/prompt_email"/>
 
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
        <RelativeLayout
            android:layout_width="match_parent"

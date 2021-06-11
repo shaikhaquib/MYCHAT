@@ -4,10 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="@dimen/activity_vertical_margin"
-    android:layout_marginLeft="@dimen/activity_vertical_margin"
-    android:layout_marginRight="@dimen/activity_vertical_margin"
     android:orientation="vertical"
+    android:background="@color/colorPrimary"
     tools:context=".activitys.Register">
 
     <ScrollView
@@ -26,7 +24,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_ychat"
+                app:srcCompat="@drawable/ic_ychat"
                 android:layout_marginTop="@dimen/activity_horizontal_margin"
                 android:layout_marginBottom="@dimen/activity_vertical_margin"
                 android:layout_gravity="center"/>
@@ -36,60 +34,54 @@
 
 
 
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
 
-                <AutoCompleteTextView
+                <EditText
                     android:id="@+id/email"
-                    android:layout_width="match_parent"
+                    android:layout_width="300dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
-                    android:drawableRight="@drawable/ic_person_black_24dp"
                     android:hint="@string/prompt_Name"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:padding="12dp"
                     android:inputType="textEmailAddress"
+                    android:textColor="#fff"
+                    android:textColorHint="#fff"
                     android:maxLines="1"
+                    app:backgroundTint="#fff"
                     android:singleLine="true" />
 
-            </android.support.design.widget.TextInputLayout>
 
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:passwordToggleDrawable="@drawable/selecter"
-                app:passwordToggleEnabled="true"
-                app:passwordToggleTint="#ff6b02">
+
 
                 <EditText
                     android:id="@+id/password"
-                    android:layout_width="match_parent"
+                    android:layout_width="300dp"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_password"
+                    android:gravity="center"
+                    android:padding="12dp"
                     android:inputType="textPassword"
                     android:maxLines="1"
+                    android:textColor="#fff"
+                    android:textColorHint="#fff"
+                    android:layout_gravity="center"
+                    app:backgroundTint="#fff"
                     android:singleLine="true" />
 
-            </android.support.design.widget.TextInputLayout>
 
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Forgot password?"
-                android:textColor="#3d3b3b"
-                android:paddingRight="4dp"
-                android:id="@+id/forpass"
-                android:layout_gravity="right"/>
 
             <Button
                 android:id="@+id/btnlogin"
                 style="?android:textAppearanceSmall"
-                android:layout_width="match_parent"
+                android:layout_width="300dp"
+                android:layout_gravity="center"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/btn_roundedcorner"
+                android:backgroundTint="#fff"
                 android:text="@string/action_sign_in"
-                android:textColor="#fff"
+                android:textColor="@color/colorPrimary"
                 android:textStyle="bold" />
 
 
@@ -107,12 +99,24 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="#fff"
                     android:text="New User?"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="  Sign Up?"
-                    android:textColor="#ff6b02"/>
+                    android:textColor="#fff"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Forgot password?"
+                    android:layout_marginStart="16dp"
+                    android:textColor="#fff"
+                    android:paddingRight="4dp"
+                    android:id="@+id/forpass"
+                    android:layout_gravity="right"/>
+
 
             </LinearLayout>
         </LinearLayout>

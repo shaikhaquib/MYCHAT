@@ -82,7 +82,7 @@
                 android:layout_weight="1"
                 android:visibility="visible" />
 
-            <android.support.design.widget.FloatingActionButton
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/call_action_fab"
@@ -101,7 +101,7 @@
                 android:layout_gravity="center"
                 android:orientation="horizontal">
 
-                <android.support.design.widget.FloatingActionButton
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/mute_action_fab"
                     android:layout_width="100dp"
                     android:layout_height="wrap_content"
@@ -112,7 +112,7 @@
                     app:srcCompat="@drawable/ic_mic_white_24dp"
                     android:visibility="visible" />
 
-                <android.support.design.widget.FloatingActionButton
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/hangup_action_fab"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
@@ -124,7 +124,7 @@
                     android:layout_marginLeft="@dimen/activity_horizontal_margin"
                     android:visibility="visible" />
 
-                <android.support.design.widget.FloatingActionButton
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/speaker"
                     android:layout_width="100dp"
                     android:layout_height="wrap_content"
