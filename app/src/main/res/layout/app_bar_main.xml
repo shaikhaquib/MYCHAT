@@ -57,15 +57,16 @@
             </RelativeLayout>
         </androidx.appcompat.widget.Toolbar>
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tabs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:tabGravity="fill"
-            app:tabIndicatorColor="@color/colorWhite"
-            app:tabMaxWidth="0dp"
-            app:tabMode="fixed"
-            app:tabSelectedTextColor="@color/colorWhite" />
     </com.google.android.material.appbar.AppBarLayout>
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:tabGravity="fill"
+        app:tabIndicatorColor="@color/colorWhite"
+        app:tabMaxWidth="0dp"
+        app:tabMode="fixed"
+        android:layout_gravity="bottom"
+        app:tabSelectedTextColor="@color/colorWhite" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

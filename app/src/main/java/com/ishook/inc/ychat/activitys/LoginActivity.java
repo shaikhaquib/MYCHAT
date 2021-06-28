@@ -17,6 +17,8 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -156,7 +158,7 @@ public void onClick(View v) {
               focusView = password;
                cancel = true;
             }else {
-        new UserLoginTask().execute(UserName, Password);}
+        new UserLoginTask().execute(UserName, Password, Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID));}
         }
         });
 
@@ -301,7 +303,9 @@ public void onClick(View v) {
         return true;
     }
 
-    @Override    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_ACCOUNTS:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -384,7 +388,8 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
             Uri.Builder builder = new Uri.Builder()
                     // .appendQueryParameter("Email", params[0])
                     .appendQueryParameter("UserName", params[0])
-                    .appendQueryParameter("Password", params[1]);
+                    .appendQueryParameter("Password", params[1])
+                    .appendQueryParameter("device_id", params[2]);
             String query = builder.build().getEncodedQuery();
 
             // Open connection for sending data
