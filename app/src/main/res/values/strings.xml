@@ -64,4 +64,7 @@
     <string name="turn_speaker_on">Speaker ON</string>
     <string name="callee">client identity or phone number</string>
     <string name="callHint">Dial a client name or phone number. Leaving the field empty results in an automated response.</string>
+    <string name="confirmation">Confirmation</string>
+    <string name="enter_otp_msg">Please enter verification code\nfrom the sms we just sent you</string>
+    <string name="confirm">Confirm</string>
 </resources>

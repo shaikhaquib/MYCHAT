@@ -18,12 +18,10 @@
             android:orientation="vertical"
             android:gravity="center">
                 <ImageView
-                    android:layout_width="250dp"
-                    android:layout_height="150dp"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
                     android:layout_marginTop="@dimen/activity_horizontal_margin"
-                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                    android:paddingLeft="@dimen/activity_horizontal_margin"
-                    android:src="@drawable/ic_crop"/>
+                     android:src="@drawable/ic_ychat"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -41,19 +39,26 @@
                     android:text="Enter your Email below to recive your \n password reset innstruction "
                     android:layout_marginBottom="30dp"/>
                 <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/activity_horizontal_margin"
+                    android:id="@+id/fetmail"
                     android:hint="Email or Username"
-                    android:singleLine="true"
-                    android:drawableRight="@drawable/ic_mail"
-                    android:id="@+id/fetmail"/>
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:padding="12dp"
+                    android:inputType="textEmailAddress"
+                    android:textColor="#7A7A7A"
+                    android:textColorHint="#534F4F"
+                    android:maxLines="1"
+                    app:backgroundTint="#454141"
+                    android:singleLine="true" />
                 <Button
-                    android:layout_width="match_parent"
+                    android:layout_width="300dp"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="@dimen/activity_horizontal_margin"
                     android:layout_marginLeft="@dimen/activity_horizontal_margin"
                     android:text="SEND PASSWORD LINK"
+                    android:layout_marginTop="20dp"
                     android:textSize="@dimen/activity_horizontal_margin"
                     android:textColor="@color/colorWhite"
                     android:background="@drawable/btn_roundedcorner"
@@ -65,7 +70,7 @@
                     android:layout_marginTop="30dp"
                     android:text="LOGIN OR REGISTER"
                     android:layout_marginBottom="@dimen/activity_horizontal_margin"
-                    android:textColor="#ff6b02"
+                    android:textColor="#bd2434"
                     android:id="@+id/loginagain"/>
 
         </LinearLayout>

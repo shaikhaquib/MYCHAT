@@ -66,6 +66,7 @@
         app:tabIndicatorColor="@color/colorWhite"
         app:tabMaxWidth="0dp"
         app:tabMode="fixed"
+        android:background="@color/colorPrimary"
         android:layout_gravity="bottom"
         app:tabSelectedTextColor="@color/colorWhite" />
 

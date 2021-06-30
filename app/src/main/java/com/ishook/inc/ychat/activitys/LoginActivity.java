@@ -2,9 +2,11 @@ package com.ishook.inc.ychat.activitys;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -13,6 +15,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -33,6 +36,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.ishook.inc.ychat.Global;
 import com.ishook.inc.ychat.R;
 
@@ -50,7 +60,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.ishook.inc.ychat.Extrra.Constants;
 import com.ishook.inc.ychat.Extrra.Session;
@@ -69,109 +81,224 @@ public class LoginActivity extends AppCompatActivity {
     Button login;
     boolean doubleBackToExitPressedOnce = false;
     private static final int MY_PERMISSIONS_REQUEST_ACCOUNTS = 1;
-    public static final int CONNECTION_TIMEOUT=10000;
-public static final int READ_TIMEOUT=15000;
+    public static final int CONNECTION_TIMEOUT = 10000;
+    public static final int READ_TIMEOUT = 15000;
     Session session;
     TextView fpass;
 
 
-
-@Override
-protected void onCreate(Bundle savedInstanceState) {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-         getSupportActionBar().hide();
-   LoginActivity.this.getWindow().setSoftInputMode(
-            WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+        getSupportActionBar().hide();
+        LoginActivity.this.getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         setContentView(R.layout.activity_login);
-        newser= (LinearLayout) findViewById(R.id.newuser);
+        newser = (LinearLayout) findViewById(R.id.newuser);
         newser.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(),Register.class));
+                startActivity(new Intent(getApplicationContext(), Register.class));
             }
         });
 
         Username = (EditText) findViewById(R.id.email);
-        password= (EditText) findViewById(R.id.password);
+        password = (EditText) findViewById(R.id.password);
         login = (Button) findViewById(R.id.btnlogin);
-        fpass= (TextView) findViewById(R.id.forpass);
+        fpass = (TextView) findViewById(R.id.forpass);
 
-    Username.setFocusable(false);
-    password.setFocusable(false);
+        Username.setFocusable(false);
+        password.setFocusable(false);
 
-    Username.setOnTouchListener(new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            Username.setFocusableInTouchMode(true);
-            return false;
+        Username.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                Username.setFocusableInTouchMode(true);
+                return false;
 
-        }
-    });
-    password.setOnTouchListener(new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            password.setFocusableInTouchMode(true);
-            return false;
+            }
+        });
+        password.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                password.setFocusableInTouchMode(true);
+                return false;
 
-        }
-    });
-
-    fpass.setOnClickListener(new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-        startActivity(new Intent(LoginActivity.this,ForgotPass.class));
-        }
-    });
-
-
-
-             session = new Session(this);
-             if(session.loggedin()){
-                  startActivity(new Intent(LoginActivity.this,MainActivity.class));
-                        finish();
-                    }
-
-
-        login.setOnClickListener(new View.OnClickListener()
-        {
-@Override
-public void onClick(View v) {
-    InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
-    imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-
-    String UserName,Password;
-        UserName= Username.getText().toString();
-        Password = password.getText().toString();
-         boolean cancel= false;
-         View focusView = null;
-        //Toast.makeText(getApplicationContext(), UserName +" & "+ Password, Toast.LENGTH_LONG).show();
-
-             if (TextUtils.isEmpty(UserName)) {
-             Toast.makeText(getApplicationContext(),"Username and Password is required",Toast.LENGTH_SHORT).show();
-              focusView = Username;
-              cancel = true;
-                  }
-             else if (TextUtils.isEmpty(Password)) {
-              password.setError(getString(R.string.error_field_required));
-                 Toast.makeText(getApplicationContext(),"Username and Password is required",Toast.LENGTH_SHORT).show();
-              focusView = password;
-               cancel = true;
-            }else {
-        new UserLoginTask().execute(UserName, Password, Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID));}
-        }
+            }
         });
 
-                        if (Build.VERSION.SDK_INT < 23) {
-                            //Do not need to check the permission
-                        } else {
-                            if (checkAndRequestPermissions()) {
-                                //If you have already permitted the permission
+        fpass.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(LoginActivity.this, ForgotPass.class));
+            }
+        });
+
+
+        session = new Session(this);
+        if (session.loggedin()) {
+            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+            finish();
+        }
+
+
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+
+                String UserName, Password;
+                UserName = Username.getText().toString();
+                Password = password.getText().toString();
+                boolean cancel = false;
+                View focusView = null;
+                //Toast.makeText(getApplicationContext(), UserName +" & "+ Password, Toast.LENGTH_LONG).show();
+
+                if (TextUtils.isEmpty(UserName)) {
+                    Toast.makeText(getApplicationContext(), "Username and Password is required", Toast.LENGTH_SHORT).show();
+                    focusView = Username;
+                    cancel = true;
+                } else if (TextUtils.isEmpty(Password)) {
+                    password.setError(getString(R.string.error_field_required));
+                    Toast.makeText(getApplicationContext(), "Username and Password is required", Toast.LENGTH_SHORT).show();
+                    focusView = password;
+                    cancel = true;
+                } else {
+                  //  new UserLoginTask().execute(UserName, Password, Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID));
+                    doLogin(UserName, Password, Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID));
+                }
+            }
+        });
+
+        if (Build.VERSION.SDK_INT < 23) {
+            //Do not need to check the permission
+        } else {
+            if (checkAndRequestPermissions()) {
+                //If you have already permitted the permission
+            }
+        }
+
+
+    }
+
+    private void doLogin(final String userName, final String password, final String deviceID) {
+        Session.UserName = userName;
+        Session.Pass = password;
+        Session.dID = deviceID;
+        final ProgressDialog pdLoading = new ProgressDialog(LoginActivity.this);
+        pdLoading.setMessage("\tLoading...");
+        pdLoading.setCancelable(false);
+        pdLoading.show();
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Global.HostName + "users/login/login_json", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String result) {
+
+                pdLoading.dismiss();
+                String loginstatus = null;
+                String session_id = null;
+                String Profile = null;
+                String login_error_msg = null;
+                String list_Post = null;
+                String Stats = null;
+                String medialist = null;
+                String ProfilePic;
+
+
+
+
+                if (result != "exception") {
+                    try {
+                        JSONObject jsonObject = new JSONObject(result);
+
+                        if (jsonObject.getBoolean("is_login")) {
+
+                            loginstatus = jsonObject.getString("is_login");
+                            session_id = jsonObject.getString("session_id");
+                            Log.d("impssh", session_id);
+                            Profile = jsonObject.getString("user_profile");
+                            JSONObject object = new JSONObject(Profile);
+                            ProfilePic = object.getString("ProfilePic");
+                            login_error_msg = jsonObject.getString("login_error_msg");
+                            Stats = jsonObject.getString("stats");
+                            list_Post = jsonObject.getString("listOfPosts");
+                            SharedPreferences sharedPreferences = getSharedPreferences(getPackageName() + Constants.PREF_FILE_NAME, Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+
+
+                            editor.putString(Constants.KEY_SESSION, session_id);
+                            editor.putString(Constants.KEY_POST, list_Post);
+                            editor.putString(Constants.KEY_PROFILE, Profile);
+                            editor.putString(Constants.KEY_STATS, Stats);
+                            editor.putString(Constants.KEY_ProfilePic, ProfilePic);
+
+
+                            editor.apply();
+
+
+                            if (loginstatus.equals("true")) {
+
+                                session.setLoggedin(true);
+                                //Toast.makeText(getApplicationContext(), session_id, Toast.LENGTH_LONG).show();
+                                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Username and Password did not match", Toast.LENGTH_SHORT).show();
+                            }
+                        }else {
+                            if (jsonObject.getInt("status") == 4) {
+
+                                new AlertDialog.Builder(LoginActivity.this)
+                                        .setTitle("Login Alert")
+                                        .setMessage(jsonObject.getString("login_error_msg"))
+                                        .setPositiveButton("Verify", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                startActivity(new Intent(getApplicationContext(), ValidatePin.class));
+                                            }
+                                        })
+                                        .setNeutralButton("Cancel", null)
+                                        .setCancelable(false)
+                                        .setIcon(android.R.drawable.ic_dialog_alert)
+                                        .show();
+                            } else {
+                                new AlertDialog.Builder(LoginActivity.this)
+                                        .setTitle("Login Alert")
+                                        .setMessage(jsonObject.getString("login_error_msg"))
+                                        .setPositiveButton("Ok", null)
+                                        .setIcon(android.R.drawable.ic_dialog_alert)
+                                        .show();
+
                             }
                         }
+                    } catch (JSONException e) {
+                        Toast.makeText(getApplicationContext(), "Username and Password did not match", Toast.LENGTH_SHORT).show();
+                        e.printStackTrace();
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(), "Check your Connection!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                pdLoading.dismiss();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("UserName", userName);
+                params.put("Password", password);
+                params.put("device_id", "4501006464537369104472106537363864153");
+                return params;
+            }
+        };
+        queue.add(stringRequest);
 
+    }
 
-        }
     private void autoLaunchActivity(Context context) {
 
 
@@ -203,7 +330,7 @@ public void onClick(View v) {
                 }
             }
 
-        } else if (Build.MANUFACTURER.equalsIgnoreCase("vivo")){
+        } else if (Build.MANUFACTURER.equalsIgnoreCase("vivo")) {
 
             Toast.makeText(context, "For Better experiance in Background Please Enable yChat app Auto Start mode !", Toast.LENGTH_LONG).show();
 
@@ -231,7 +358,7 @@ public void onClick(View v) {
             }
 
 
-        }else if(Build.BRAND.equalsIgnoreCase("xiaomi") ){
+        } else if (Build.BRAND.equalsIgnoreCase("xiaomi")) {
             Toast.makeText(context, "For Better experiance in Background Please Enable yChat app Auto Start mode !", Toast.LENGTH_LONG).show();
 
             Intent intent = new Intent();
@@ -239,15 +366,14 @@ public void onClick(View v) {
             startActivity(intent);
 
 
-        }else if(Build.BRAND.equalsIgnoreCase("Letv")){
+        } else if (Build.BRAND.equalsIgnoreCase("Letv")) {
             Toast.makeText(context, "For Better experiance in Background Please Enable yChat app Auto Start mode !", Toast.LENGTH_LONG).show();
 
             Intent intent = new Intent();
             intent.setComponent(new ComponentName("com.letv.android.letvsafe", "com.letv.android.letvsafe.AutobootManageActivity"));
             startActivity(intent);
 
-        }
-        else if(Build.BRAND.equalsIgnoreCase("Honor")){
+        } else if (Build.BRAND.equalsIgnoreCase("Honor")) {
             Toast.makeText(context, "For Better experiance in Background Please Enable yChat app Auto Start mode !", Toast.LENGTH_LONG).show();
             Intent intent = new Intent();
             intent.setComponent(new ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity"));
@@ -276,7 +402,6 @@ public void onClick(View v) {
                 Manifest.permission.READ_EXTERNAL_STORAGE);
 
 
-
         List<String> listPermissionsNeeded = new ArrayList<>();
         if (storagePermission != PackageManager.PERMISSION_GRANTED) {
             listPermissionsNeeded.add(Manifest.permission.READ_EXTERNAL_STORAGE);
@@ -289,15 +414,15 @@ public void onClick(View v) {
         }
         if (permissioncotact != PackageManager.PERMISSION_GRANTED) {
             listPermissionsNeeded.add(Manifest.permission.READ_CONTACTS);
-        } if (permissionCAMERA != PackageManager.PERMISSION_GRANTED) {
+        }
+        if (permissionCAMERA != PackageManager.PERMISSION_GRANTED) {
             listPermissionsNeeded.add(Manifest.permission.RECEIVE_BOOT_COMPLETED);
         }
 
         if (!listPermissionsNeeded.isEmpty()) {
-            ActivityCompat.requestPermissions(this,listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]),MY_PERMISSIONS_REQUEST_ACCOUNTS);
+            ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]), MY_PERMISSIONS_REQUEST_ACCOUNTS);
             return false;
         }
-
 
 
         return true;
@@ -334,15 +459,15 @@ public void onClick(View v) {
 
             @Override
             public void run() {
-                doubleBackToExitPressedOnce=false;
+                doubleBackToExitPressedOnce = false;
             }
         }, 2000);
     }
 
     @Override
-protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        }
+    }
 
     public class UserLoginTask extends AsyncTask<String, String, String> {
         ProgressDialog pdLoading = new ProgressDialog(LoginActivity.this);
@@ -362,143 +487,145 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
 
         @Override
-    protected String doInBackground(String... params) {
-        try {
+        protected String doInBackground(String... params) {
+            try {
 
-            // Enter URL address where your php file resides
-            url = new URL(Global.HostName+"users/login/login_json");
+                // Enter URL address where your php file resides
+                url = new URL(Global.HostName + "users/login/login_json");
 
-        } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return "exception";
-        }
-        try {
-            // Setup HttpURLConnection class to send and receive data from php and mysql
-            conn = (HttpURLConnection)url.openConnection();
-            conn.setReadTimeout(READ_TIMEOUT);
-            conn.setConnectTimeout(CONNECTION_TIMEOUT);
-            conn.setRequestMethod("POST");
+            } catch (MalformedURLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return "exception";
+            }
+            try {
+                // Setup HttpURLConnection class to send and receive data from php and mysql
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setReadTimeout(READ_TIMEOUT);
+                conn.setConnectTimeout(CONNECTION_TIMEOUT);
+                conn.setRequestMethod("POST");
 
-            // setDoInput and setDoOutput method depict handling of both send and receive
-            conn.setDoInput(true);
-            conn.setDoOutput(true);
+                // setDoInput and setDoOutput method depict handling of both send and receive
+                conn.setDoInput(true);
+                conn.setDoOutput(true);
 
-            // Append parameters to URL
-            Uri.Builder builder = new Uri.Builder()
-                    // .appendQueryParameter("Email", params[0])
-                    .appendQueryParameter("UserName", params[0])
-                    .appendQueryParameter("Password", params[1])
-                    .appendQueryParameter("device_id", params[2]);
-            String query = builder.build().getEncodedQuery();
+                // Append parameters to URL
+                Uri.Builder builder = new Uri.Builder()
+                        // .appendQueryParameter("Email", params[0])
+                        .appendQueryParameter("UserName", params[0])
+                        .appendQueryParameter("Password", params[1])
+                        .appendQueryParameter("device_id", params[2]);
+                String query = builder.build().getEncodedQuery();
 
-            // Open connection for sending data
-            OutputStream os = conn.getOutputStream();
-            BufferedWriter writer = new BufferedWriter(
-                    new OutputStreamWriter(os, "UTF-8"));
-            writer.write(query);
-            writer.flush();
-            writer.close();
-            os.close();
-            conn.connect();
+                // Open connection for sending data
+                OutputStream os = conn.getOutputStream();
+                BufferedWriter writer = new BufferedWriter(
+                        new OutputStreamWriter(os, "UTF-8"));
+                writer.write(query);
+                writer.flush();
+                writer.close();
+                os.close();
+                conn.connect();
 
-        } catch (IOException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-            return "exception";
-        }
-
-        try {
-
-            int response_code = conn.getResponseCode();
-
-            // Check if successful connection made
-            if (response_code == HttpURLConnection.HTTP_OK) {
-
-                // Read data sent from server
-                InputStream input = conn.getInputStream();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-                StringBuilder result = new StringBuilder();
-                String line;
-
-                while ((line = reader.readLine()) != null) {
-                    result.append(line);
-                }
-
-                // Pass data to onPostExecute method
-                return(result.toString());
-
-            }else{
-
-                return("unsuccessful");
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+                return "exception";
             }
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "exception";
-        } finally {
-            conn.disconnect();
-        }
-
-
-    }
-
-    @Override
-    protected void onPostExecute(String result) {
-
-        pdLoading.dismiss();
-        String loginstatus = null;
-        String session_id = null;
-        String Profile = null;
-        String login_error_msg = null;
-        String list_Post = null;
-        String Stats = null;
-        String medialist = null;
-        String ProfilePic;
-
-
-        if (result != "exception") {
             try {
-                JSONObject jsonObject = new JSONObject(result);
-                loginstatus = jsonObject.getString("is_login");
-                session_id = jsonObject.getString("session_id");
-                Log.d("impssh",session_id);
-                Profile = jsonObject.getString("user_profile");
-                JSONObject object = new JSONObject(Profile);
-                ProfilePic = object.getString("ProfilePic");
-                login_error_msg = jsonObject.getString("login_error_msg");
-                Stats = jsonObject.getString("stats");
-                list_Post = jsonObject.getString("listOfPosts");
-                SharedPreferences sharedPreferences = getSharedPreferences(getPackageName() + Constants.PREF_FILE_NAME, Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
 
+                int response_code = conn.getResponseCode();
 
-                editor.putString(Constants.KEY_SESSION, session_id);
-                editor.putString(Constants.KEY_POST, list_Post);
-                editor.putString(Constants.KEY_PROFILE, Profile);
-                editor.putString(Constants.KEY_STATS, Stats);
-                editor.putString(Constants.KEY_ProfilePic, ProfilePic);
+                // Check if successful connection made
+                if (response_code == HttpURLConnection.HTTP_OK) {
 
+                    // Read data sent from server
+                    InputStream input = conn.getInputStream();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+                    StringBuilder result = new StringBuilder();
+                    String line;
 
-                editor.apply();
+                    while ((line = reader.readLine()) != null) {
+                        result.append(line);
+                    }
 
-
-                if (loginstatus.equals("true")) {
-
-                    session.setLoggedin(true);
-                    //Toast.makeText(getApplicationContext(), session_id, Toast.LENGTH_LONG).show();
-                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    // Pass data to onPostExecute method
+                    return (result.toString());
 
                 } else {
-                    Toast.makeText(getApplicationContext(), "Username and Password did not match", Toast.LENGTH_SHORT).show();
+
+                    return ("unsuccessful");
                 }
-            } catch (JSONException e) {
-                Toast.makeText(getApplicationContext(), "Username and Password did not match", Toast.LENGTH_SHORT).show();
+
+            } catch (IOException e) {
                 e.printStackTrace();
+                return "exception";
+            } finally {
+                conn.disconnect();
             }
-        }else {                Toast.makeText(getApplicationContext(), "Check your Connection!", Toast.LENGTH_SHORT).show();
+
+
         }
-    }
+
+        @Override
+        protected void onPostExecute(String result) {
+
+            pdLoading.dismiss();
+            String loginstatus = null;
+            String session_id = null;
+            String Profile = null;
+            String login_error_msg = null;
+            String list_Post = null;
+            String Stats = null;
+            String medialist = null;
+            String ProfilePic;
+
+
+            if (result != "exception") {
+                try {
+                    JSONObject jsonObject = new JSONObject(result);
+                    loginstatus = jsonObject.getString("is_login");
+                    session_id = jsonObject.getString("session_id");
+                    Log.d("impssh", session_id);
+                    Profile = jsonObject.getString("user_profile");
+                    JSONObject object = new JSONObject(Profile);
+                    ProfilePic = object.getString("ProfilePic");
+                    login_error_msg = jsonObject.getString("login_error_msg");
+                    Stats = jsonObject.getString("stats");
+                    list_Post = jsonObject.getString("listOfPosts");
+                    SharedPreferences sharedPreferences = getSharedPreferences(getPackageName() + Constants.PREF_FILE_NAME, Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+
+
+                    editor.putString(Constants.KEY_SESSION, session_id);
+                    editor.putString(Constants.KEY_POST, list_Post);
+                    editor.putString(Constants.KEY_PROFILE, Profile);
+                    editor.putString(Constants.KEY_STATS, Stats);
+                    editor.putString(Constants.KEY_ProfilePic, ProfilePic);
+
+
+                    editor.apply();
+
+
+                    if (loginstatus.equals("true")) {
+
+                        session.setLoggedin(true);
+                        //Toast.makeText(getApplicationContext(), session_id, Toast.LENGTH_LONG).show();
+                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Username and Password did not match", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (JSONException e) {
+                    Toast.makeText(getApplicationContext(), "Username and Password did not match", Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+            } else {
+                Toast.makeText(getApplicationContext(), "Check your Connection!", Toast.LENGTH_SHORT).show();
+            }
+        }
+
         @Override
         protected void onCancelled() {
 
