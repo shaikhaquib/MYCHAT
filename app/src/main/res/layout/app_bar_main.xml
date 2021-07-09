@@ -61,13 +61,14 @@
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabs"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?actionBarSize"
         app:tabGravity="fill"
         app:tabIndicatorColor="@color/colorWhite"
         app:tabMaxWidth="0dp"
         app:tabMode="fixed"
-        android:background="@color/colorPrimary"
+        android:background="@color/colorWhite"
         android:layout_gravity="bottom"
-        app:tabSelectedTextColor="@color/colorWhite" />
+        app:tabTextColor="@color/colorPrimary"
+        app:tabSelectedTextColor="@color/colorPrimary" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

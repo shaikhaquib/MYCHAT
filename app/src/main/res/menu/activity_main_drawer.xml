@@ -5,30 +5,30 @@
 
         <item
             android:id="@+id/Notification"
-            android:icon="@drawable/ic_notifications"
+            android:icon="@drawable/bell"
             android:title="Notification"
             app:actionViewClass="android.widget.TextView"
             />
         <item
             android:id="@+id/freindrequestlist"
-            android:icon="@drawable/ic_friend_request"
+            android:icon="@drawable/addfrnd"
             android:title="Friend request" />
 
         <item
             android:id="@+id/friend"
-            android:icon="@drawable/ic_friend"
+            android:icon="@drawable/people"
             android:title="Friends" />
         <item
             android:id="@+id/Album"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/square"
             android:title="Album" />
         <item
             android:id="@+id/nav_message"
-            android:icon="@drawable/ic_email"
+            android:icon="@drawable/ic__chat"
             android:title="Message" />
         <item
             android:id="@+id/nav_setting"
-            android:icon="@drawable/ic_settings"
+            android:icon="@drawable/setting"
             android:title="Setting" />
         <item
             android:id="@+id/nav_applemusic"
@@ -42,7 +42,7 @@
         <menu>
             <item
                 android:id="@+id/logout"
-                android:icon="@drawable/ic_powe"
+                android:icon="@drawable/power_off"
                 android:title="Logout" />
 
         </menu>

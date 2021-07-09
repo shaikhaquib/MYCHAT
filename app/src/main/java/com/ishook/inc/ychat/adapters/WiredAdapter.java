@@ -573,7 +573,7 @@ public class WiredAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         TextView thumbdesc;
         ImageView multiple_image_sign;
         TextView thumburl;
-        RelativeLayout layout;
+        LinearLayout layout;
         ImageView deletmenu;
         Wire_list current;int position;
         LinearLayout linearLayout;
@@ -606,7 +606,7 @@ public class WiredAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
             linearLayout= (LinearLayout) itemView.findViewById(R.id.linkp);
 
-            layout= (RelativeLayout) itemView.findViewById(R.id.wire_layout);
+            layout= itemView.findViewById(R.id.wire_layout);
             deletmenu= (ImageView) itemView.findViewById(R.id.deletewire);
 
         }

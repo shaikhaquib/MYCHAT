@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     boolean doubleBackToExitPressedOnce = false;
     private int[] tabIcons = {
             R.drawable.ic_wire_white,
-            R.drawable.ic_icon2,
+            R.drawable.ic__chat,
 /*
             R.drawable.ic_clique_icon
 */
