@@ -64,8 +64,12 @@ import com.ishook.inc.ychat.fragments.TabWires;
 import com.ishook.inc.ychat.fragments.TabyChat;
 import com.ishook.inc.ychat.fragments.Update_ProfilePic;
 import com.bumptech.glide.Glide;
+
+
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
+import com.twilio.voice.LogLevel;
+import com.twilio.voice.LogModule;
 import com.twilio.voice.RegistrationException;
 import com.twilio.voice.RegistrationListener;
 import com.twilio.voice.Voice;
@@ -935,12 +939,12 @@ startActivity(new Intent(getApplicationContext(), Album.class));
     }
 
 
-    private void registerForCallInvites() {
-        final String fcmToken = FirebaseInstanceId.getInstance().getToken();
-        if (fcmToken != null) {
-            Log.i("Twilio", "Registering with FCM");
-            Voice.register(this, Global.accessToken, Voice.RegistrationChannel.FCM, fcmToken, registrationListener);
-        }
+    private void registerForCallInvites(String fcmToken) {
+        Voice.setLogLevel(LogLevel.DEBUG);
+        Voice.setModuleLogLevel(LogModule.SIGNALING, LogLevel.ALL);
+        Voice.setModuleLogLevel(LogModule.WEBRTC, LogLevel.ALL);
+        Voice.register(Global.accessToken, Voice.RegistrationChannel.FCM, fcmToken, registrationListener);
+
     }
     private RegistrationListener registrationListener() {
         return new RegistrationListener() {
@@ -960,19 +964,27 @@ startActivity(new Intent(getApplicationContext(), Album.class));
 
 
     private void retrieveAccessToken() {
-        Ion.with(this).load(TWILIO_ACCESS_TOKEN_SERVER_URL + "?identity=" + UserName.replace("\\s+","").toLowerCase()).asString().setCallback(new FutureCallback<String>() {
-            @Override
-            public void onCompleted(Exception e, String accessToken) {
-                if (e == null) {
-                    Log.d("Twilio", "Access token: " + accessToken);
-                    Global.accessToken = accessToken;
-                    registerForCallInvites();
-                } else {
-                    Snackbar.make(tabLayout,
-                            "Error retrieving access token. Unable to make calls",
-                            Snackbar.LENGTH_LONG).show();
+
+        FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(this, instanceIdResult -> {
+            String fcmToken = instanceIdResult.getToken();
+            Log.i("TAG", "Registering with FCM");
+            String path = TWILIO_ACCESS_TOKEN_SERVER_URL + "?identity=" + UserName.replace("\\s+","").toLowerCase()/*+ "&deviceId=" + fcmToken*/;
+            Log.d("Twilio", "Access token Path: " + path);
+            Ion.with(this).load(path).asString().setCallback(new FutureCallback<String>() {
+                @Override
+                public void onCompleted(Exception e, String accessToken) {
+                    if (e == null) {
+                        Log.d("Twilio", "Access token: " + accessToken);
+                        Global.accessToken = accessToken;
+                        registerForCallInvites(fcmToken);
+                    } else {
+                        Snackbar.make(tabLayout,
+                                "Error retrieving access token. Unable to make calls",
+                                Snackbar.LENGTH_LONG).show();
+                    }
                 }
-            }
+            });
         });
+
     }
 }

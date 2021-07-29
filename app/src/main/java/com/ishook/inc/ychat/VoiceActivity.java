@@ -43,10 +43,14 @@ import com.ishook.inc.ychat.app.MainActivity;
 import com.twilio.voice.Call;
 import com.twilio.voice.CallException;
 import com.twilio.voice.CallInvite;
+import com.twilio.voice.ConnectOptions;
+import com.twilio.voice.LogLevel;
+import com.twilio.voice.LogModule;
 import com.twilio.voice.RegistrationException;
 import com.twilio.voice.RegistrationListener;
 import com.twilio.voice.Voice;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -66,10 +70,16 @@ public class VoiceActivity extends AppCompatActivity {
      * For example : https://myurl.io/accessToken.php
      */
     private static final String TWILIO_ACCESS_TOKEN_SERVER_URL = Global.HostName+"ishook_voice_call/andr/accessToken.php";
+    public static final String ACTION_ACCEPT = "ACTION_ACCEPT";
+    public static final String ACTION_REJECT = "ACTION_REJECT";
+    public static final String ACTION_INCOMING_CALL = "ACTION_INCOMING_CALL";
+    public static final String ACTION_CANCEL_CALL = "ACTION_CANCEL_CALL";
+    public static final String CANCELLED_CALL_INVITE = "CANCELLED_CALL_INVITE";
 
     private static final int MIC_PERMISSION_REQUEST_CODE = 1;
-    private static final int SNACKBAR_DURATION = 4000;
-
+    private static final int SNACKBAR_DURATION = Snackbar.LENGTH_LONG;
+    public static final String VOICE_CHANNEL_LOW_IMPORTANCE = "notification-channel-low-importance";
+    public static final String VOICE_CHANNEL_HIGH_IMPORTANCE = "notification-channel-high-importance";
     public static String freindid , freindname;
     private AudioManager audioManager;
     FloatingActionButton floatingActionButton;
@@ -91,7 +101,6 @@ public class VoiceActivity extends AppCompatActivity {
     TextView maincallerid;
     public static final String INCOMING_CALL_INVITE = "INCOMING_CALL_INVITE";
     public static final String INCOMING_CALL_NOTIFICATION_ID = "INCOMING_CALL_NOTIFICATION_ID";
-    public static final String ACTION_INCOMING_CALL = "ACTION_INCOMING_CALL";
     public static final String ACTION_FCM_TOKEN = "ACTION_FCM_TOKEN";
 
     private NotificationManager notificationManager;
@@ -187,20 +196,27 @@ public class VoiceActivity extends AppCompatActivity {
         } else {
           //  retrieveAccessToken();
         }
+        Voice.setLogLevel(LogLevel.DEBUG);
+        Voice.setModuleLogLevel(LogModule.SIGNALING, LogLevel.ALL);
+        Voice.setModuleLogLevel(LogModule.WEBRTC, LogLevel.ALL);
 
-
+        if (checkPermissionForMicrophone())
         if (!freindid.equals("")&&!freindname.equals("")){
 
             if (Global.accessToken!=null && !Global.accessToken.isEmpty()){
             //    EditText contact = (EditText) ((AlertDialog) dialog).findViewById(R.id.contact);
                 twiMLParams.put("to",freindname.replaceAll(" ","").toLowerCase());
-                activeCall = Voice.call(VoiceActivity.this, Global.accessToken, twiMLParams, callListener);
+                ConnectOptions connectOptions = new ConnectOptions.Builder(Global.accessToken)
+                        .params(twiMLParams)
+                        .build();
+                activeCall = Voice.connect(VoiceActivity.this, connectOptions, callListener);
                 setCallUI();
              //   alertDialog.dismiss();
             }else {
                 Snackbar.make(coordinatorLayout,
-                        "Connection problem ! please Check your network connection or restart app...",
-                        SNACKBAR_DURATION).show();
+                        "Connection problem ! please Check your network connection or restart app..."
+                        ,Snackbar.LENGTH_LONG
+                        ).show();
                 finish();
             }
 
@@ -227,7 +243,7 @@ public class VoiceActivity extends AppCompatActivity {
             public void onError(RegistrationException error, String accessToken, String fcmToken) {
                 String message = String.format("Registration Error: %d, %s", error.getErrorCode(), error.getMessage());
                 Log.e(TAG, message);
-                Snackbar.make(coordinatorLayout, message, SNACKBAR_DURATION).show();
+                Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG).show();
             }
         };
     }
@@ -240,10 +256,16 @@ public class VoiceActivity extends AppCompatActivity {
                 Log.d(TAG, "Connect failure");
                 String message = String.format("Call Error: %d, %s", error.getErrorCode(), error.getMessage());
                 Log.e(TAG, message);
-                Snackbar.make(coordinatorLayout, message, SNACKBAR_DURATION).show();
+                Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG).show();
                 resetUI();
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
                 finish();
+            }
+
+            @Override
+            public void onRinging(@NonNull @NotNull Call call) {
+                Log.d(TAG, "RINGING");
+
             }
 
             @Override
@@ -254,15 +276,25 @@ public class VoiceActivity extends AppCompatActivity {
             }
 
             @Override
+            public void onReconnecting(@NonNull @NotNull Call call, @NonNull @NotNull CallException e) {
+
+            }
+
+            @Override
+            public void onReconnected(@NonNull @NotNull Call call) {
+
+            }
+
+            @Override
             public void onDisconnected(Call call, CallException error) {
                 setAudioFocus(false);
                 Log.d(TAG, "Disconnected");
                 if (error != null) {
                     String message = String.format("Call Error: %d, %s", error.getErrorCode(), error.getMessage());
                     Log.e(TAG, message);
-                    Snackbar.make(coordinatorLayout, message, SNACKBAR_DURATION).show();
+                    Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG).show();
                 }else {
-                    Snackbar.make(coordinatorLayout, "Connection error", SNACKBAR_DURATION).show();
+                    Snackbar.make(coordinatorLayout, "Connection error", Snackbar.LENGTH_LONG).show();
                 }
                 resetUI();
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
@@ -320,7 +352,7 @@ public class VoiceActivity extends AppCompatActivity {
         if (intent != null && intent.getAction() != null) {
             if (intent.getAction().equals(ACTION_INCOMING_CALL)) {
                 activeCallInvite = intent.getParcelableExtra(INCOMING_CALL_INVITE);
-                if (activeCallInvite != null && (activeCallInvite.getState() == CallInvite.State.PENDING)) {
+                if (activeCallInvite != null && (activeCall.getState() == Call.State.RINGING)) {
                     soundPoolManager.playRinging();
 /*
                     alertDialog = createIncomingCallDialog(VoiceActivity.this,
@@ -433,13 +465,17 @@ public class VoiceActivity extends AppCompatActivity {
                 if (Global.accessToken!=null && !Global.accessToken.isEmpty()){
                     EditText contact = (EditText) ((AlertDialog) dialog).findViewById(R.id.contact);
                     twiMLParams.put("to",freindname.replaceAll(" ","").toLowerCase());
-                    activeCall = Voice.call(VoiceActivity.this, Global.accessToken, twiMLParams, callListener);
+
+                    ConnectOptions connectOptions = new ConnectOptions.Builder(Global.accessToken)
+                            .params(twiMLParams)
+                            .build();
+                    activeCall = Voice.connect(VoiceActivity.this, connectOptions, callListener);
                     setCallUI();
                     alertDialog.dismiss();
                 }else {
                     Snackbar.make(coordinatorLayout,
                             "Connection problem ! please Check your network connection or restart app...",
-                            SNACKBAR_DURATION).show();
+                            Snackbar.LENGTH_LONG).show();
                     finish();
                 }
 
@@ -492,7 +528,7 @@ public class VoiceActivity extends AppCompatActivity {
         final String fcmToken = FirebaseInstanceId.getInstance().getToken();
         if (fcmToken != null) {
             Log.i(TAG, "Registering with FCM");
-            Voice.register(this, Global.accessToken, Voice.RegistrationChannel.FCM, fcmToken, registrationListener);
+            Voice.register( Global.accessToken, Voice.RegistrationChannel.FCM, fcmToken, registrationListener);
         }
     }
 
@@ -607,7 +643,7 @@ public class VoiceActivity extends AppCompatActivity {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO)) {
             Snackbar.make(coordinatorLayout,
                     "Microphone permissions needed. Please allow in your application settings.",
-                    SNACKBAR_DURATION).show();
+                    Snackbar.LENGTH_LONG).show();
         } else {
             ActivityCompat.requestPermissions(
                     this,
@@ -615,19 +651,19 @@ public class VoiceActivity extends AppCompatActivity {
                     MIC_PERMISSION_REQUEST_CODE);
         }
     }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         /*
          * Check if microphone permissions is granted
          */
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == MIC_PERMISSION_REQUEST_CODE && permissions.length > 0) {
             if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                 Snackbar.make(coordinatorLayout,
                         "Microphone permissions needed. Please allow in your application settings.",
-                        SNACKBAR_DURATION).show();
+                        Snackbar.LENGTH_LONG).show();
             } else {
-             //  retrieveAccessToken();
+//                retrieveAccessToken();
             }
         }
     }
