@@ -3,8 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/MYCHAT.iml" filepath="$PROJECT_DIR$/.idea/modules/MYCHAT.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/PinView/MYCHAT.PinView.iml" filepath="$PROJECT_DIR$/.idea/modules/PinView/MYCHAT.PinView.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/MYCHAT.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/MYCHAT.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/chat/MYCHAT.chat.iml" filepath="$PROJECT_DIR$/.idea/modules/chat/MYCHAT.chat.iml" />
     </modules>
   </component>
 </project>

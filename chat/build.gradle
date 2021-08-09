@@ -1,0 +1,86 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.twilio.apkscale'
+
+def ACCESS_TOKEN_SERVICE_URL = project.hasProperty('ACCESS_TOKEN_SERVICE_URL') ? "\""+project.getProperty('ACCESS_TOKEN_SERVICE_URL')+"\"" : "\"http://example.com/token\""
+
+dependencies {
+    implementation "androidx.appcompat:appcompat:$androidXVersion"
+    implementation 'com.google.android.material:material:1.2.1'
+
+    implementation 'com.google.firebase:firebase-core:17.5.1'
+    implementation 'com.google.firebase:firebase-iid:20.3.0'
+    implementation 'com.google.firebase:firebase-messaging:20.3.0'
+    implementation 'uk.co.ribot:easyadapter:1.5.0@aar'
+
+
+    api "com.jakewharton:kotterknife:0.1.0-SNAPSHOT"
+    api "eu.inloop:simplerecycleradapter:0.3.4"
+
+    api 'com.twilio:chat-android-with-symbols:6.1.1'
+
+    api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion"
+    api "org.jetbrains.anko:anko:0.10.5"
+
+    def multidex_version = "2.0.1"
+    api "androidx.multidex:multidex:$multidex_version"
+}
+apkscale {
+    // Optional parameter to provide size reports for each ABI in addition to the default universal ABI
+    abis = ['x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a']
+
+    // Optional parameter to specify whether the output is human readable. Defaults to true.
+}
+android {
+    compileSdkVersion androidCompileSdkVersion
+
+    defaultConfig {
+        targetSdkVersion androidCompileSdkVersion
+        buildToolsVersion androidBuildToolsVersion
+        minSdkVersion 19
+
+        versionCode 26
+        versionName "1.0"
+
+        multiDexEnabled true
+        buildConfigField "String", "ACCESS_TOKEN_SERVICE_URL", ACCESS_TOKEN_SERVICE_URL
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+        useIR = true
+    }
+
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+}
+
+// Keep an eye on SDK deprecations
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-Xlint:deprecation" << "-Xdiags:verbose"
+}
+
+if (hasProperty("googleServicesJson")) {
+    copy {
+        from(googleServicesJson)
+        into(projectDir)
+    }
+}

@@ -75,7 +75,6 @@ public class FriendsList extends AppCompatActivity {
 
         rvytab = (RecyclerView)findViewById(R.id.rvfriend);
         swipeRefreshLayout= (SwipeRefreshLayout) findViewById(R.id.swfriend);
-        rvytab.setHasFixedSize(true);
         recyclerViewlayoutManager = new LinearLayoutManager(getApplicationContext());
         cont = getApplicationContext();
         ProfileUserId="";

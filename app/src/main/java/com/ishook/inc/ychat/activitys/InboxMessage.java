@@ -45,7 +45,6 @@ public class InboxMessage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inbox_message);
         rvInbox= (RecyclerView) findViewById(R.id.rvInbox);
-        rvInbox.setHasFixedSize(true);
         cont = getApplicationContext();
         setTitle("Inbox");
 

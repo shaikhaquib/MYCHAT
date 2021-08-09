@@ -68,7 +68,6 @@ public class Member_list extends AppCompatActivity {
         setContentView(R.layout.activity_membe_list);
         no_member= (TextView) findViewById(R.id.no_member);
         rvMember= (RecyclerView) findViewById(R.id.rvroomMember);
-        rvMember.setHasFixedSize(true);
         layoutManager=new LinearLayoutManager(getApplicationContext());
         back= (ImageView) findViewById(R.id.memberlist_back);
         GroupTitle= (TextView) findViewById(R.id.group_name);

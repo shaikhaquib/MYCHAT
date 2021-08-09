@@ -14,12 +14,17 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
+
 import androidx.fragment.app.Fragment;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.MenuItemCompat;
@@ -31,6 +36,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+
 import android.text.InputFilter;
 import android.util.Base64;
 import android.util.Log;
@@ -64,8 +70,16 @@ import com.ishook.inc.ychat.fragments.TabWires;
 import com.ishook.inc.ychat.fragments.TabyChat;
 import com.ishook.inc.ychat.fragments.Update_ProfilePic;
 import com.bumptech.glide.Glide;
-import com.koushikdutta.async.future.FutureCallback;
-import com.koushikdutta.ion.Ion;
+
+import com.twilio.chat.CallbackListener;
+import com.twilio.chat.Channel;
+import com.twilio.chat.ChannelDescriptor;
+import com.twilio.chat.Paginator;
+import com.twilio.chat.demo.BasicChatClient;
+import com.twilio.chat.demo.BuildConfig;
+import com.twilio.chat.demo.ChannelModel;
+import com.twilio.chat.demo.TwilioApplication;
+import com.twilio.chat.demo.activities.ChannelActivity;
 import com.twilio.voice.RegistrationException;
 import com.twilio.voice.RegistrationListener;
 import com.twilio.voice.Voice;
@@ -86,32 +100,35 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @SuppressWarnings("deprecation")
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, BasicChatClient.LoginListener {
 
-  private List<Fragment> fragments = new ArrayList<>();
+    private List<Fragment> fragments = new ArrayList<>();
     private List<String> titles = new ArrayList<>();
+    ProgressDialog progressDialog;
 
     public static final int CONNECTION_TIMEOUT = 10000;
     public static final int READ_TIMEOUT = 15000;
 
-    private static final String TWILIO_ACCESS_TOKEN_SERVER_URL = "https://ishook.com/ishook_voice_call/andr/accessToken.php";
+    private static final String TWILIO_ACCESS_TOKEN_SERVER_URL = "https://ishook.com/twilio/AccessTokenVoice.php";
     RegistrationListener registrationListener = registrationListener();
 
-    String sessionid=null;
-    String otheruserid=null;
-    String userid=null;
+    String sessionid = null;
+    String otheruserid = null;
+    String userid = null;
     String ProfilePic;
-    String Coverpic=null;
+    String Coverpic = null;
     String encodedString;
     String imgextention;
     View imgview;
 
-    String msg_type="1";
-    String fetch_data="true";
+    String msg_type = "1";
+    String fetch_data = "true";
 
 
     String imgPath, fileName;
@@ -134,12 +151,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FragmentViewPagerAdapter adapter;
     private TabLayout tabLayout;
     private Session session;
-    private String UserName=null;
+    public static String UserName = null;
     int maxLength = 10;
     InputFilter[] FilterArray = new InputFilter[1];
 
 
-    String js=null;
+    String js = null;
 
     private static int RESULT_LOAD_IMG = 1;
 
@@ -168,6 +185,61 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     String newText;
 
+    public static HashMap<String,ChannelModel>channels = new HashMap<>();
+    public static Map<String,ChannelModel>channelNames = new HashMap<>();
+    public static BasicChatClient basicClient;
+    private void getChannels(final BasicChatClient basicClient) {
+        channels.clear();
+
+        basicClient.getChatClient().getChannels().getPublicChannelsList(new CallbackListener<Paginator<ChannelDescriptor>>() {
+            @Override
+            public void onSuccess(Paginator<ChannelDescriptor> channelDescriptorPaginator) {
+                getChannelsPage(channelDescriptorPaginator,basicClient);
+            }
+        });
+
+        basicClient.getChatClient().getChannels().getUserChannelsList(new CallbackListener<Paginator<ChannelDescriptor>>() {
+            @Override
+            public void onSuccess(Paginator<ChannelDescriptor> channelDescriptorPaginator) {
+                getChannelsPage(channelDescriptorPaginator,basicClient);
+            }
+        });
+    }
+
+    private void getChannelsPage(Paginator<ChannelDescriptor> paginator, final BasicChatClient basicClient) {
+        for (ChannelDescriptor cd: paginator.getItems()) {
+            Log.d( "getChannelsPage: ", "Adding channel descriptor for sid|"+cd.getSid()+"| friendlyName "+ cd.getFriendlyName()+"| UniqueName "+ cd.getUniqueName());
+            channels.put(cd.getSid(), new ChannelModel(cd));
+            channelNames.put(cd.getFriendlyName(), new ChannelModel(cd));
+        }
+
+        if (paginator.hasNextPage()) {
+            paginator.requestNextPage(new CallbackListener<Paginator<ChannelDescriptor>>() {
+                @Override
+                public void onSuccess(Paginator<ChannelDescriptor> channelDescriptorPaginator) {
+                    getChannelsPage(channelDescriptorPaginator,basicClient);
+                }
+            });
+        } else {
+            // Get subscribed channels last - so their status will overwrite whatever we received
+            // from public list. Ugly workaround for now.
+            List<Channel> chans = basicClient.getChatClient().getChannels().getSubscribedChannels();
+            if (chans != null) {
+                for (Channel channel : chans) {
+                    channels.put(channel.getSid(),new ChannelModel(channel));
+                    channelNames.put(channel.getFriendlyName(), new ChannelModel(channel));
+                    Log.d( "getChannelsPage: ", "Adding channel descriptor for sid|"+channel.getSid()+"| friendlyName "+ channel.getFriendlyName()+"| UniqueName "+ channel.getUniqueName());
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+      //  twillioChatLogin();
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,47 +248,44 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ft = getFragmentManager().beginTransaction();
 
 
-        SharedPreferences sharedPreferences =getSharedPreferences( getPackageName()+ Constants.PREF_FILE_NAME, Context.MODE_PRIVATE);
+
+        SharedPreferences sharedPreferences = getSharedPreferences(getPackageName() + Constants.PREF_FILE_NAME, Context.MODE_PRIVATE);
         String profile = sharedPreferences.getString(Constants.KEY_PROFILE, "N/A");
         sessionid = sharedPreferences.getString(Constants.KEY_SESSION, "N/A");
         notiCount = sharedPreferences.getString(Constants.KEY_Noti_count, "");
 
 
         // ProfilePic = sharedPreferences.getString(Constants.KEY_ProfilePic, "N/A");
-        final String[] from = new String[] {"UserName"};
-        final int[] to = new int[] {android.R.id.text1};
+        final String[] from = new String[]{"UserName"};
+        final int[] to = new int[]{android.R.id.text1};
         FilterArray[0] = new InputFilter.LengthFilter(maxLength);
-
-
 
 
         myAdapter = new SimpleCursorAdapter(MainActivity.this, R.layout.item_suggetion, null, from, to, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
 
 
-
-
-                    try {
+        try {
             //            JSONObject jsonObject=new JSONObject(userdata);
-                        JSONObject object =new JSONObject(profile);
-                            userid=object.getString("user_id");
-                            otheruserid=object.getString("user_id");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+            JSONObject object = new JSONObject(profile);
+            userid = object.getString("user_id");
+            otheruserid = object.getString("user_id");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
 
-                    Global.sessionid=sessionid;
-                    Global.userid=userid;
-            toolbar = (Toolbar) findViewById(R.id.toolbar);
-            toolbar.setContentInsetStartWithNavigation(0);
-            searchtollbar = (Toolbar) findViewById(R.id.search_toolbar);
-            setSupportActionBar(toolbar);
+        Global.sessionid = sessionid;
+        Global.userid = userid;
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setContentInsetStartWithNavigation(0);
+        searchtollbar = (Toolbar) findViewById(R.id.search_toolbar);
+        setSupportActionBar(toolbar);
         //adding session
 
-            session = new Session(this);
-            if(!session.loggedin()){
-                logout();
-            }
+        session = new Session(this);
+        if (!session.loggedin()) {
+            logout();
+        }
 
 
         viewPager = (ViewPager) findViewById(R.id.container);
@@ -248,14 +317,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         final View headerLayout = navigationView.inflateHeaderView(R.layout.nav_header_main);
 
         navigationView.setNavigationItemSelectedListener(this);
-        noticount=(TextView) MenuItemCompat.getActionView(navigationView.getMenu().
+        noticount = (TextView) MenuItemCompat.getActionView(navigationView.getMenu().
                 findItem(R.id.Notification));
 
-        coverpic= (ImageView) headerLayout.findViewById(R.id.coverPic);
-        profilepic= (ImageView)headerLayout.findViewById(R.id.drawer_propic);
-        updt_coverpic= (ImageView) headerLayout.findViewById(R.id.update_coverpic);
-        updcoer_prog= (ProgressBar) headerLayout.findViewById(R.id.updcoer_prog);
-        ImageView pro_setting= (ImageView) headerLayout.findViewById(R.id.pro_setting);
+        coverpic = (ImageView) headerLayout.findViewById(R.id.coverPic);
+        profilepic = (ImageView) headerLayout.findViewById(R.id.drawer_propic);
+        updt_coverpic = (ImageView) headerLayout.findViewById(R.id.update_coverpic);
+        updcoer_prog = (ProgressBar) headerLayout.findViewById(R.id.updcoer_prog);
+        ImageView pro_setting = (ImageView) headerLayout.findViewById(R.id.pro_setting);
 
         pro_setting.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -264,27 +333,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
         profilepic.setOnClickListener(new View.OnClickListener() {
-             @Override
-             public void onClick(View v) {
-                 getSupportFragmentManager().beginTransaction().add(android.R.id.content, new Update_ProfilePic ()).commit();
-             }
-         });
+            @Override
+            public void onClick(View v) {
+                getSupportFragmentManager().beginTransaction().add(android.R.id.content, new Update_ProfilePic()).commit();
+            }
+        });
 
 
-
-        new AsyncUserinfo().execute(sessionid,userid,otheruserid);
+        new AsyncUserinfo().execute(sessionid, userid, otheruserid);
         String profiled = sharedPreferences.getString(Constants.KEY_ProfileDetail, "N/A");
         JSONObject jobject = null;
         try {
             jobject = new JSONObject(profiled);
-    } catch (JSONException e) {
-        e.printStackTrace();
-    }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         //Notification
         notfication();
         initializeCountDrawer();
         navigationView.setItemIconTintList(null);
-
 
 
     }
@@ -300,16 +367,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void notfication() {
 
         Intent intent = new Intent(this, MyNotificationService.class);
-        intent.putExtra("sid",sessionid);
-        intent.putExtra("uid",userid);
-        intent.putExtra("mt",msg_type);
-        intent.putExtra("fd",fetch_data);		startService(intent);
+        intent.putExtra("sid", sessionid);
+        intent.putExtra("uid", userid);
+        intent.putExtra("mt", msg_type);
+        intent.putExtra("fd", fetch_data);
+        startService(intent);
 
     }
 
 
     public void loadImagefromGallery(View view) {
-        imgview=view;
+        imgview = view;
         // Create intent to Open Image applications like Gallery, Google Photos
         Intent galleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         // Start the Intent
@@ -356,8 +424,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 // Put file name in Async Http Post Param which will used in Php web app
                 // Convert image to String using Base64
-                new UpdateCover(getApplicationContext(), updcoer_prog,coverpic,bm).execute(userid, sessionid, encodedString, imgextention);
-
+                new UpdateCover(getApplicationContext(), updcoer_prog, coverpic, bm).execute(userid, sessionid, encodedString, imgextention);
 
 
             } else {
@@ -385,6 +452,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return imgString;
 
     }
+
     @Override
     public void onBackPressed() {
         Intent a = new Intent(Intent.ACTION_MAIN);
@@ -405,9 +473,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         getMenuInflater().inflate(R.menu.menu_search, menu);
 
-    return true;
+        return true;
     }
-
 
 
     @Override
@@ -418,9 +485,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-       if (id == R.id.action_search) {
+        if (id == R.id.action_search) {
 
-           startActivity(new Intent(getApplicationContext(),Search.class));
+            startActivity(new Intent(getApplicationContext(), Search.class));
             return true;
         }
 
@@ -433,37 +500,38 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-         if (id == R.id.Notification) {
-             startActivity(new Intent(getApplicationContext(),NotificationList.class));
+        if (id == R.id.Notification) {
+            startActivity(new Intent(getApplicationContext(), NotificationList.class));
         } else if (id == R.id.freindrequestlist) {
-             startActivity(new Intent(getApplicationContext(), FriendRequests.class));
-        }else  if (id == R.id.friend) {
-             startActivity(new Intent(getApplicationContext(),FriendsList.class));
-         } else if (id == R.id.Album) {
-startActivity(new Intent(getApplicationContext(), Album.class));
-    }else if(id== R.id.nav_message) {
+            startActivity(new Intent(getApplicationContext(), FriendRequests.class));
+        } else if (id == R.id.friend) {
+            startActivity(new Intent(getApplicationContext(), FriendsList.class));
+        } else if (id == R.id.Album) {
+            startActivity(new Intent(getApplicationContext(), Album.class));
+        } else if (id == R.id.nav_message) {
             startActivity(new Intent(getApplicationContext(), InboxMessage.class));
-         }else if(id== R.id.nav_setting) {
+        } else if (id == R.id.nav_setting) {
             startActivity(new Intent(getApplicationContext(), Setting.class));
-        }else if(id== R.id.nav_applemusic) {
-             boolean isAppInstalled = appInstalledOrNot("com.apple.android.music");
+        } else if (id == R.id.nav_applemusic) {
+            boolean isAppInstalled = appInstalledOrNot("com.apple.android.music");
 
-             if(isAppInstalled) {
-                 //This intent will help you to launch if the package is already installed
-                 Intent LaunchIntent = getPackageManager()
-                         .getLaunchIntentForPackage("com.apple.android.music");
-                 startActivity(LaunchIntent);
+            if (isAppInstalled) {
+                //This intent will help you to launch if the package is already installed
+                Intent LaunchIntent = getPackageManager()
+                        .getLaunchIntentForPackage("com.apple.android.music");
+                startActivity(LaunchIntent);
 
-                 System.out.println("Application is already installed.");
-             } else {
-                 // Do whatever we want to do if application not installed
-                 // For example, Redirect to play store
+                System.out.println("Application is already installed.");
+            } else {
+                // Do whatever we want to do if application not installed
+                // For example, Redirect to play store
 
-                 System.out.println("Application is not currently installed.");
-                 Intent intent = new Intent(Intent.ACTION_VIEW);
-                 intent.setData(Uri.parse("https://play.google.com/store/apps/details?id=com.apple.android.music&referrer=utm_source=https%3A%2F%2Fitunes.apple.com%2Fsubscribe%3Fapp%3Dmusic%26at%3D1001lMLL"));
-                 startActivity(intent);
-             }       }else if (id == R.id.logout) {
+                System.out.println("Application is not currently installed.");
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse("https://play.google.com/store/apps/details?id=com.apple.android.music&referrer=utm_source=https%3A%2F%2Fitunes.apple.com%2Fsubscribe%3Fapp%3Dmusic%26at%3D1001lMLL"));
+                startActivity(intent);
+            }
+        } else if (id == R.id.logout) {
             logout();
 
         }
@@ -484,11 +552,12 @@ startActivity(new Intent(getApplicationContext(), Album.class));
         return false;
     }
 
-    private void logout(){
+    private void logout() {
         session.setLoggedin(false);
-        new AsyncLogOut().execute(userid,sessionid);
+        new AsyncLogOut().execute(userid, sessionid);
 
     }
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void prepareDataResource() {
 
@@ -513,6 +582,7 @@ startActivity(new Intent(getApplicationContext(), Album.class));
         viewPager.setCurrentItem(0);
 
     }
+
     // Sets the Icons for the Tabs
     private void setTabIcons() {
 
@@ -523,8 +593,8 @@ startActivity(new Intent(getApplicationContext(), Album.class));
 */
 
 
-
     }
+
     public View getTabView(int position) {
         View view = LayoutInflater.from(this).inflate(R.layout.customeview, null);
         TextView txt_title = (TextView) view.findViewById(R.id.txt_title);
@@ -535,18 +605,47 @@ startActivity(new Intent(getApplicationContext(), Album.class));
         return view;
     }
 
-    private  class AsyncUserinfo extends AsyncTask <String,String,String>{
+    @Override
+    public void onLoginStarted() {
+    progressDialog.show();
+    }
+
+    @Override
+    public void onLoginFinished() {
+        Log.d("TAG", "onLoginFinished: ");
+        basicClient = TwilioApplication.Companion.getInstance().basicClient;
+        getChannels(basicClient);
+        progressDialog.dismiss();
+
+        // startActivity(new Intent(getApplicationContext(), ChannelActivity.class));
+    }
+
+    @Override
+    public void onLoginError(@NonNull String errorMessage) {
+        TwilioApplication.Companion.getInstance().showToast("Error logging in : " + errorMessage, Toast.LENGTH_LONG);
+        progressDialog.dismiss();
+        Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void onLogoutFinished() {
+
+    }
+
+    private class AsyncUserinfo extends AsyncTask<String, String, String> {
         HttpURLConnection conn;
         URL url = null;
+
         @Override
         protected String doInBackground(String... params) {
             try {
-                url = new URL(Global.HostName+"/home/profile/bio_json");
+                url = new URL(Global.HostName + "/home/profile/bio_json");
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
             try {
-                conn = (HttpURLConnection)url.openConnection();
+                conn = (HttpURLConnection) url.openConnection();
                 conn.setReadTimeout(READ_TIMEOUT);
                 conn.setConnectTimeout(CONNECTION_TIMEOUT);
                 conn.setRequestMethod("POST");
@@ -591,11 +690,11 @@ startActivity(new Intent(getApplicationContext(), Album.class));
                     }
 
                     // Pass data to onPostExecute method
-                    return(result.toString());
+                    return (result.toString());
 
-                }else{
+                } else {
 
-                    return("unsuccessful");
+                    return ("unsuccessful");
                 }
 
             } catch (IOException e) {
@@ -611,85 +710,81 @@ startActivity(new Intent(getApplicationContext(), Album.class));
         protected void onPostExecute(String result) {
 
 
-            if (result=="exception"){
+            if (result == "exception") {
 
                 try {
-                    SharedPreferences preferences = getSharedPreferences( getApplicationContext().getPackageName()+Constants.PREF_FILE_NAME, Context.MODE_PRIVATE);
+                    SharedPreferences preferences = getSharedPreferences(getApplicationContext().getPackageName() + Constants.PREF_FILE_NAME, Context.MODE_PRIVATE);
                     String profiledetail = preferences.getString(Constants.KEY_ProfileDetail, "N/A");
-                    JSONObject jsonObject=new JSONObject(profiledetail);
+                    JSONObject jsonObject = new JSONObject(profiledetail);
 
-                    Coverpic=jsonObject.getString("CoverPic");
-                    Log.d("coverpic",Coverpic);
-                    ProfilePic=jsonObject.getString("ProfilePic");
-                    Log.d("ppic",ProfilePic);
+                    Coverpic = jsonObject.getString("CoverPic");
+                    Log.d("coverpic", Coverpic);
+                    ProfilePic = jsonObject.getString("ProfilePic");
+                    Log.d("ppic", ProfilePic);
 
 
-                    UserName=jsonObject.getString("FirstName")+"_"+userid;
+                    UserName = jsonObject.getString("FirstName") + "_" + userid;
                     retrieveAccessToken();
+                    twillioChatLogin();
                     setTitle(jsonObject.getString("UserName"));
-                    Glide.with(getApplicationContext()).load(Global.HostName+Coverpic)
-                            .into(coverpic) ;
+                    Glide.with(getApplicationContext()).load(Global.HostName + Coverpic)
+                            .into(coverpic);
                     coverpic.getLayoutParams().height = 500;
                     coverpic.requestLayout();
-                    Glide.with(getApplicationContext()).load(Global.HostName+ProfilePic)
+                    Glide.with(getApplicationContext()).load(Global.HostName + ProfilePic)
                             .into(profilepic);
 
 
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
 
+            } else {
+
+                try {
+
+                    JSONObject jsonObject = new JSONObject(result);
+                    String userprofile = jsonObject.getString("profile");
+                    JSONObject object = new JSONObject(userprofile);
+
+
+                    Coverpic = object.getString("CoverPic");
+                    Log.d("coverpic", Coverpic);
+                    ProfilePic = object.getString("ProfilePic");
+                    Log.d("ppic", ProfilePic);
+                    String jabber_user = object.getString("jabber_user");
+
+
+                    setTitle(object.getString("UserName"));
+                    Glide.with(getApplicationContext()).load(Global.HostName + Coverpic).into(coverpic);
+                    coverpic.getLayoutParams().height = 500;
+                    coverpic.requestLayout();
+                    Glide.with(getApplicationContext()).load(Global.HostName + ProfilePic)
+                            .into(profilepic);
+
+                    UserName = object.getString("UserName") + "_" + userid;
+                    retrieveAccessToken();
+                    twillioChatLogin();
+
+                    SharedPreferences sharedPreferences = getSharedPreferences(getPackageName() + Constants.PREF_FILE_NAME, Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString(Constants.KEY_ProfileDetail, userprofile);
+                    editor.putString(Constants.KEY_USERID, userid);
+                    editor.putString(Constants.KEY_jabber_user, jabber_user);
+                    editor.apply();
 
 
                 } catch (JSONException e) {
-                e.printStackTrace();
+                    e.printStackTrace();
+                }
+
+
             }
-
-
-            }else {
-
-            try {
-
-                JSONObject jsonObject=new JSONObject(result);
-                String userprofile=jsonObject.getString("profile");
-                JSONObject object=new JSONObject(userprofile);
-
-
-
-                Coverpic=object.getString("CoverPic");
-                Log.d("coverpic",Coverpic);
-                ProfilePic=object.getString("ProfilePic");
-                Log.d("ppic",ProfilePic);
-                String jabber_user=object.getString("jabber_user");
-
-
-
-                setTitle(object.getString("UserName"));
-                Glide.with(getApplicationContext()).load(Global.HostName+Coverpic).into(coverpic) ;
-                coverpic.getLayoutParams().height = 500;
-                coverpic.requestLayout();
-                Glide.with(getApplicationContext()).load(Global.HostName+ProfilePic)
-                        .into(profilepic);
-
-                UserName=object.getString("UserName")+"_"+userid;
-                retrieveAccessToken();
-
-                SharedPreferences sharedPreferences = getSharedPreferences(getPackageName() + Constants.PREF_FILE_NAME, Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString(Constants.KEY_ProfileDetail,userprofile);
-                editor.putString(Constants.KEY_USERID,userid);
-                editor.putString(Constants.KEY_jabber_user,jabber_user);
-                editor.apply();
-
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-
-
-        }}
+        }
     }
 
-    public class AsyncSearch extends AsyncTask <String,String,String> {
+    public class AsyncSearch extends AsyncTask<String, String, String> {
 
         HttpURLConnection conn;
         URL url = null;
@@ -699,7 +794,7 @@ startActivity(new Intent(getApplicationContext(), Album.class));
             try {
 
                 // Enter URL address where your php file resides
-                url = new URL(Global.HostName+"users/friends/find_friend_andr");
+                url = new URL(Global.HostName + "users/friends/find_friend_andr");
 
             } catch (MalformedURLException e) {
                 // TODO Auto-generated catch block
@@ -708,7 +803,7 @@ startActivity(new Intent(getApplicationContext(), Album.class));
             }
             try {
                 // Setup HttpURLConnection class to send and receive data from php and mysql
-                conn = (HttpURLConnection)url.openConnection();
+                conn = (HttpURLConnection) url.openConnection();
                 conn.setReadTimeout(READ_TIMEOUT);
                 conn.setConnectTimeout(CONNECTION_TIMEOUT);
                 conn.setRequestMethod("POST");
@@ -722,9 +817,8 @@ startActivity(new Intent(getApplicationContext(), Album.class));
                         // .appendQueryParameter("Email", params[0])
                         .appendQueryParameter("sessionId", params[0])
                         .appendQueryParameter("UserId", params[1])
-                        .appendQueryParameter("searchKeyword", params[2])
-                        ;
-                       /* .appendQueryParameter("privacy", params[3])*/
+                        .appendQueryParameter("searchKeyword", params[2]);
+                /* .appendQueryParameter("privacy", params[3])*/
                 String query = builder.build().getEncodedQuery();
 
                 // Open connection for sending data
@@ -761,11 +855,11 @@ startActivity(new Intent(getApplicationContext(), Album.class));
                     }
 
                     // Pass data to onPostExecute method
-                    return(result.toString());
+                    return (result.toString());
 
-                }else{
+                } else {
 
-                    return("unsuccessful");
+                    return ("unsuccessful");
                 }
 
             } catch (IOException e) {
@@ -780,10 +874,10 @@ startActivity(new Intent(getApplicationContext(), Album.class));
         @Override
         protected void onPostExecute(String s) {
             try {
-                JSONObject jsonObject=new JSONObject(s);
+                JSONObject jsonObject = new JSONObject(s);
                 ArrayList<String> dataList = new ArrayList<>();
 
-               Log.d("s",s);
+                Log.d("s", s);
              /*    search_data=jsonObject.getString("users");
                 js=s;
 
@@ -796,16 +890,16 @@ startActivity(new Intent(getApplicationContext(), Album.class));
               /*  String[] strings= (String[]) jsonObject.get("users");
                 search_suggestion=strings.g*/
 
-                JSONArray jsonArray=jsonObject.getJSONArray("friends");
-                for(int i=0; i<jsonArray.length();i++){
+                JSONArray jsonArray = jsonObject.getJSONArray("friends");
+                for (int i = 0; i < jsonArray.length(); i++) {
 
-                    JSONObject object=jsonArray.getJSONObject(i);
+                    JSONObject object = jsonArray.getJSONObject(i);
 
-                    String s1=object.getString("UserName");
-                    String s2=object.getString("userId");
+                    String s1 = object.getString("UserName");
+                    String s2 = object.getString("userId");
 
-                    String s3=s1+"           @"+s2;
-                   // String[] strings={s1,s2};
+                    String s3 = s1 + "           @" + s2;
+                    // String[] strings={s1,s2};
 
                     dataList.add(s3);
 
@@ -817,21 +911,21 @@ startActivity(new Intent(getApplicationContext(), Album.class));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            if (search_suggestion!=null){
-                strArrData=new String[] {search_suggestion};
+            if (search_suggestion != null) {
+                strArrData = new String[]{search_suggestion};
             }
             Log.d("sa", String.valueOf(strArrData));
-            final MatrixCursor mc = new MatrixCursor(new String[]{ BaseColumns._ID, "UserName" });
-            for (int i=0; i<strArrData.length; i++) {
+            final MatrixCursor mc = new MatrixCursor(new String[]{BaseColumns._ID, "UserName"});
+            for (int i = 0; i < strArrData.length; i++) {
                 if (strArrData[i].toLowerCase().startsWith(newText.toLowerCase()))
-                    mc.addRow(new Object[] {i, strArrData[i]});
+                    mc.addRow(new Object[]{i, strArrData[i]});
             }
             myAdapter.changeCursor(mc);
         }
     }
 
 
-    private class AsyncLogOut extends AsyncTask<String ,String,String> {
+    private class AsyncLogOut extends AsyncTask<String, String, String> {
 
         ProgressDialog pdLoading = new ProgressDialog(MainActivity.this);
         HttpURLConnection conn;
@@ -847,15 +941,16 @@ startActivity(new Intent(getApplicationContext(), Album.class));
             pdLoading.show();
 
         }
+
         @Override
         protected String doInBackground(String... params) {
             try {
-                url = new URL(Global.HostName+"users/login/logout_json");
+                url = new URL(Global.HostName + "users/login/logout_json");
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
             try {
-                conn = (HttpURLConnection)url.openConnection();
+                conn = (HttpURLConnection) url.openConnection();
                 conn.setReadTimeout(READ_TIMEOUT);
                 conn.setConnectTimeout(CONNECTION_TIMEOUT);
                 conn.setRequestMethod("POST");
@@ -899,12 +994,12 @@ startActivity(new Intent(getApplicationContext(), Album.class));
                     }
 
                     // Pass data to onPostExecute method
-                    return(result.toString());
+                    return (result.toString());
 
 
-                }else{
+                } else {
 
-                    return("unsuccessful");
+                    return ("unsuccessful");
                 }
 
             } catch (IOException e) {
@@ -926,10 +1021,9 @@ startActivity(new Intent(getApplicationContext(), Album.class));
             Intent intent = new Intent(MainActivity.this, MyNotificationService.class);
             stopService(intent);
             finish();
-            startActivity(new Intent(getApplicationContext(),LoginActivity.class));
+            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
 
         }
-
 
 
     }
@@ -942,6 +1036,7 @@ startActivity(new Intent(getApplicationContext(), Album.class));
             Voice.register(this, Global.accessToken, Voice.RegistrationChannel.FCM, fcmToken, registrationListener);
         }
     }
+
     private RegistrationListener registrationListener() {
         return new RegistrationListener() {
             @Override
@@ -960,6 +1055,7 @@ startActivity(new Intent(getApplicationContext(), Album.class));
 
 
     private void retrieveAccessToken() {
+/*
         Ion.with(this).load(TWILIO_ACCESS_TOKEN_SERVER_URL + "?identity=" + UserName.replace("\\s+","").toLowerCase()).asString().setCallback(new FutureCallback<String>() {
             @Override
             public void onCompleted(Exception e, String accessToken) {
@@ -974,5 +1070,35 @@ startActivity(new Intent(getApplicationContext(), Album.class));
                 }
             }
         });
+*/
+    }
+
+    public void twillioChatLogin() {
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Loading...");
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.edit()
+                .putString("userName", getTitle().toString())
+                .putBoolean("pinCerts", false)
+                .putString("realm", "us1")
+                .putString("ttl", Global.userid)
+                .apply();
+
+        String url = Uri.parse(BuildConfig.ACCESS_TOKEN_SERVICE_URL)
+                .buildUpon()
+                .appendQueryParameter("identity", UserName)
+                .appendQueryParameter("realm", "us1")
+                .appendQueryParameter("ttl", Global.userid)
+                .build()
+                .toString();
+
+        BasicChatClient basicClient = TwilioApplication.Companion.getInstance().basicClient;
+
+        basicClient.login(UserName, false, "us1", url, this);
+
+        //getChannels(basicClient);
+
     }
 }

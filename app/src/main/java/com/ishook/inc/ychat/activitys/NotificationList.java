@@ -51,7 +51,6 @@ public class NotificationList extends AppCompatActivity {
         setContentView(R.layout.activity_notification_list);
 
         rvNoti= (RecyclerView) findViewById(R.id.rvNotification);
-        rvNoti.setHasFixedSize(true);
         rvNoti.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
 
         setTitle("Notification");

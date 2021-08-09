@@ -51,7 +51,6 @@ public class Album extends AppCompatActivity {
         setContentView(R.layout.activity_album);
 
         rvAlbum= (RecyclerView) findViewById(R.id.rvAlbum);
-        rvAlbum.setHasFixedSize(true);
         cont=getApplicationContext();
         SharedPreferences sharedPreferences =getSharedPreferences( getPackageName()+ Constants.PREF_FILE_NAME, Context.MODE_PRIVATE);
         Sid = sharedPreferences.getString(Constants.KEY_SESSION, "N/A");

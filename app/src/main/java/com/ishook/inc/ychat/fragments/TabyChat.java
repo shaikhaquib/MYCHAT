@@ -80,7 +80,6 @@ public class TabyChat extends Fragment {
 
         rvytab = (RecyclerView) rootView.findViewById(R.id.ytabrview);
         swipeRefreshLayout= (SwipeRefreshLayout) rootView.findViewById(R.id.swLayout);
-        rvytab.setHasFixedSize(true);
         recyclerViewlayoutManager = new LinearLayoutManager(getContext());
         cont = getActivity();
         ProfileUserId="";

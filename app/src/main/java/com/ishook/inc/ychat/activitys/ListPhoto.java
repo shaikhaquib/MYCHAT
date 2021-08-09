@@ -49,7 +49,6 @@ public class ListPhoto extends AppCompatActivity {
         setContentView(R.layout.activity_list_photo);
 
         rvPhoto= (RecyclerView) findViewById(R.id.rvPhotolist);
-        rvPhoto.setHasFixedSize(true);
         rvPhoto.setLayoutManager(new GridLayoutManager(getApplicationContext(),2));
         cont=getApplicationContext();
         setTitle("Photo's");

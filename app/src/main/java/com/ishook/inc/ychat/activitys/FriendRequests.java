@@ -51,7 +51,6 @@ public class FriendRequests extends AppCompatActivity {
         setContentView(R.layout.activity_friend_requests);
 
         RvFrlist = (RecyclerView) findViewById(R.id.rvfrlist);
-        RvFrlist.setHasFixedSize(true);
         recyclerViewlayoutManager = new LinearLayoutManager(getApplicationContext());
         no_request= (LinearLayout) findViewById(R.id.no_request);
 

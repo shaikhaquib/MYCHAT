@@ -95,7 +95,6 @@ public class Comment extends AppCompatActivity {
         });
 
         rvComment = (RecyclerView) findViewById(R.id.CommentList);
-        rvComment.setHasFixedSize(true);
         recyclerViewlayoutManager = new LinearLayoutManager(getApplicationContext());
 
 

@@ -109,7 +109,6 @@ public class TabWires extends Fragment {
         }
 
         rvWire = (RecyclerView) rootView.findViewById(R.id.rvWiredlist);
-        rvWire.setHasFixedSize(true);
         recyclerViewlayoutManager = new LinearLayoutManager(getContext());
 
 

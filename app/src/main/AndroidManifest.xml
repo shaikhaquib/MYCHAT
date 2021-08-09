@@ -87,9 +87,6 @@
 
         </activity>
         <activity
-            android:name=".fragments.Update_ProfilePic"
-            android:parentActivityName=".app.MainActivity" />
-        <activity
             android:name=".activitys.Setting"
             android:label="@string/title_activity_setting"
             android:theme="@style/AppTheme.OnlyTitle" />

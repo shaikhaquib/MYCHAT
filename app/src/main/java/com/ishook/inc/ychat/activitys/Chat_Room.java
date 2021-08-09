@@ -44,10 +44,6 @@ import com.ishook.inc.ychat.list.Chat_list;
 import com.bumptech.glide.Glide;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewCallback;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
-import com.leocardz.link.preview.library.LinkPreviewCallback;
-import com.leocardz.link.preview.library.SourceContent;
-import com.leocardz.link.preview.library.TextCrawler;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -106,7 +102,6 @@ public class Chat_Room extends AppCompatActivity {
 
 
     private Timer timer;
-    private TextCrawler textCrawler;
     private ViewGroup dropPreview, dropPost;
     private ProgressBar previewAreaTitle ;
     String Htmlcode;
@@ -141,7 +136,6 @@ public class Chat_Room extends AppCompatActivity {
                         public void run() {
                             if (Message.getText().toString().contains("https://")){
                                 System.out.println("Contains");
-                                textCrawler.makePreview(new callback(), Message.getText().toString());
                                 System.out.println("Console"+Htmlcode);
                             }
                             else{
@@ -276,7 +270,6 @@ public class Chat_Room extends AppCompatActivity {
 
         /** Where the previews will be dropped */
 
-        textCrawler = new TextCrawler();
         final View content = getLayoutInflater().inflate(
                 R.layout.preview_content, layout);
         content.setVisibility(View.GONE);
@@ -584,214 +577,6 @@ public class Chat_Room extends AppCompatActivity {
 
     }
 
-    private class callback implements LinkPreviewCallback {
-        /**
-         * This view is used to be updated or added in the layout after getting
-         * the result
-         */
-        private View mainView;
-        private LinearLayout linearLayout;
-        private View loading;
-        private ImageView imageView;
-        private String currentTitle, currentUrl, currentCannonicalUrl,
-                currentDescription;
-        private Bitmap[] currentImageSet;
-        private Bitmap currentImage;
-        private int currentItem = 0;
-        private int countBigImages = 0;
-        private boolean noThumb;
-
-        @Override
-        public void onPre() {
-            // hideSoftKeyboard();
-
-            currentImageSet = null;
-            currentItem = 0;
-
-            previewAreaTitle.setVisibility(View.VISIBLE);
-
-            currentImage = null;
-            noThumb = false;
-            currentTitle = currentDescription = currentUrl = currentCannonicalUrl = "";
-
-            //submitButton.setEnabled(false);
-
-
-            /** Inflating the preview layout */
-            mainView = getLayoutInflater().inflate(R.layout.main_view, null);
-
-            linearLayout = (LinearLayout) mainView.findViewById(R.id.external);
-
-            /**
-             * Inflating a loading layout into Main View LinearLayout
-             */
-            if(dropPreview.getChildCount()==0){
-                dropPreview.addView(mainView);
-                System.out.println("dropview after"+dropPreview.getChildCount());}else{
-                previewAreaTitle.setVisibility(View.GONE);
-                Message.setFocusable(true);
-
-            }
-
-        }
-
-        @Override
-        public void onPos(final SourceContent sourceContent, boolean isNull) {
-
-            /** Removing the loading layout */
-            linearLayout.removeAllViews();
-
-
-
-
-            previewAreaTitle.setVisibility(View.GONE);
-
-            String img=String.valueOf(sourceContent.getImages());
-            img = img.replaceAll("\\[", "").replaceAll("\\]","");
-            Htmlcode=" <div class=\"liveurl liveurlwire\" style=\"display: block;\">\n" +
-                    " <a style=\"\" href=" +"\""+sourceContent.getUrl()+"\""+" target=\"_blank\" class=\"previewmainurl\">\n" +
-                    " <div class=\"inner\"> <div class=\"image\"><img class=\"img_link\" src="+"\""+img+"\""+">\n" +
-                    " </div> <div class=\"details\"> <div class=\"info\"> <div class=\"title\">"+sourceContent.getTitle()+"</div> <div class=\"description\">"+sourceContent.getDescription()+"</div> <div class=\"url\"> "+sourceContent.getUrl()+"</div> </div> <div class=\"video\"></div> </div> </div> </a> </div>";
-
-            Log.d("img", img);
-            Log.d("url",sourceContent.getUrl());
-            Log.d("url",sourceContent.getDescription());
-            Log.d("url",sourceContent.getTitle());
-            Log.d("Htmlcode",Htmlcode);
-
-
-
-            currentImageSet = new Bitmap[sourceContent.getImages().size()];
-
-            /**
-             * Inflating the content layout into Main View LinearLayout
-             */
-            final View content = getLayoutInflater().inflate(
-                    R.layout.preview_content, linearLayout);
-
-
-
-
-            if (sourceContent.getTitle().equals("") && sourceContent.getDescription().equals("")){
-                content.setVisibility(View.GONE);
-                releasePreviewArea();
-            }
-
-            /** Fullfilling the content layout */
-            final LinearLayout infoWrap = (LinearLayout) content
-                    .findViewById(R.id.info_wrap);
-            final LinearLayout titleWrap = (LinearLayout) infoWrap
-                    .findViewById(R.id.title_wrap);
-
-            final ImageView imageSet = (ImageView) content
-                    .findViewById(R.id.image_post_set);
-
-            final TextView close = (TextView) titleWrap
-                    .findViewById(R.id.close);
-            final TextView titleTextView = (TextView) titleWrap
-                    .findViewById(R.id.title);
-
-            final TextView urlTextView = (TextView) content
-                    .findViewById(R.id.url);
-            final TextView descriptionTextView = (TextView) content
-                    .findViewById(R.id.description);
-
-
-
-
-
-            close.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View arg0) {
-                    releasePreviewArea();
-                }
-            });
-
-
-
-            if (sourceContent.getImages().size() > 0) {
-
-
-
-                UrlImageViewHelper.setUrlDrawable(imageSet, sourceContent
-                        .getImages().get(0), new UrlImageViewCallback() {
-
-                    @Override
-                    public void onLoaded(ImageView imageView,
-                                         Bitmap loadedBitmap, String url,
-                                         boolean loadedFromCache) {
-                        if (loadedBitmap != null) {
-                            currentImage = loadedBitmap;
-                            currentImageSet[0] = loadedBitmap;
-                        }
-                    }
-                });
-
-            } else {
-                showHideImage(imageSet, infoWrap, false);
-            }
-
-
-
-            titleTextView.setText(sourceContent.getTitle());
-            urlTextView.setText(sourceContent.getCannonicalUrl());
-            descriptionTextView.setText(sourceContent.getDescription());
-
-
-
-            currentTitle = sourceContent.getTitle();
-            currentDescription = sourceContent.getDescription();
-            currentUrl = sourceContent.getUrl();
-            currentCannonicalUrl = sourceContent.getCannonicalUrl();
-        }
-
-
-
-        /**
-         * Hide keyboard
-         */
-     /*   private void hideSoftKeyboard() {
-            hideSoftKeyboard(etWireText);
-
-
-        }*/
-
-        /**
-         * Show or hide the image layout according to the "No Thumbnail" ckeckbox
-         */
-        private void showHideImage(View image, View parent, boolean show) {
-            if (show) {
-                image.setVisibility(View.VISIBLE);
-                parent.setPadding(5, 5, 5, 5);
-                parent.setLayoutParams(new LinearLayout.LayoutParams(0,
-                        LinearLayout.LayoutParams.WRAP_CONTENT, 2f));
-            } else {
-                image.setVisibility(View.GONE);
-                parent.setPadding(5, 5, 5, 5);
-                parent.setLayoutParams(new LinearLayout.LayoutParams(0,
-                        LinearLayout.LayoutParams.WRAP_CONTENT, 3f));
-            }
-        }
-
-/*
-        private void hideSoftKeyboard(EditText editText) {
-            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
-            inputMethodManager
-                    .hideSoftInputFromWindow(editText.getWindowToken(), 0);
-        }*/
-
-        /**
-         * Just a set of urls
-         */
-
-
-
-        private void releasePreviewArea() {
-            previewAreaTitle.setVisibility(View.GONE);
-            dropPreview.removeAllViews();
-        }
-    }
 
 
     public class UserConversation extends AsyncTask<String, String, String> {

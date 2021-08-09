@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="default_web_client_id" translatable="false">356217672803-uj0bricrl1f9m9mc8plq3gr0o0feit3v.apps.googleusercontent.com</string>
+    <string name="firebase_database_url" translatable="false">https://voice-quickstart-android-6ed90.firebaseio.com</string>
+    <string name="gcm_defaultSenderId" translatable="false">356217672803</string>
+    <string name="google_api_key" translatable="false">AIzaSyCe6PEntBRuSylUzvqLv0Z1gR12cOIxV2o</string>
+    <string name="google_app_id" translatable="false">1:356217672803:android:76d696570a84e5d46ad456</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyCe6PEntBRuSylUzvqLv0Z1gR12cOIxV2o</string>
+    <string name="google_storage_bucket" translatable="false">voice-quickstart-android-6ed90.appspot.com</string>
+    <string name="project_id" translatable="false">voice-quickstart-android-6ed90</string>
+</resources>
