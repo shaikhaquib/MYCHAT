@@ -65,10 +65,11 @@ public class Message_service extends Service {
 
 
 
-         sleepTime = intent.getIntExtra("sleepTime",0);
-         mid = intent.getIntExtra("mid",1);
-         myReciver=intent.getParcelableExtra("myReciver");
-
+        if (intent!=null) {
+            sleepTime = intent.getIntExtra("sleepTime", 0);
+            mid = intent.getIntExtra("mid", 1);
+            myReciver = intent.getParcelableExtra("myReciver");
+        }
 
         return START_STICKY;
     }

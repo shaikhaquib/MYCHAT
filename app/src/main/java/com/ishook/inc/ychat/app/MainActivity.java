@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static final int CONNECTION_TIMEOUT = 10000;
     public static final int READ_TIMEOUT = 15000;
 
-    private static final String TWILIO_ACCESS_TOKEN_SERVER_URL = "https://ishook.com/ishook_voice_call/andr/accessToken.php";
+    private static final String TWILIO_ACCESS_TOKEN_SERVER_URL = "https://ishook.com/twilio/AccessTokenVoice.php";
     RegistrationListener registrationListener = registrationListener();
 
     String sessionid=null;
