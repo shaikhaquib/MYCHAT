@@ -17,7 +17,8 @@
         <item
             android:id="@+id/friend"
             android:icon="@drawable/people"
-            android:title="Friends" />
+            android:title="Friends"
+            android:visible="false"/>
         <item
             android:id="@+id/Album"
             android:icon="@drawable/square"
@@ -25,7 +26,8 @@
         <item
             android:id="@+id/nav_message"
             android:icon="@drawable/ic__chat"
-            android:title="Message" />
+            android:title="Message"
+            android:visible="false"/>
         <item
             android:id="@+id/nav_setting"
             android:icon="@drawable/setting"

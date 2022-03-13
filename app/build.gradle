@@ -6,11 +6,15 @@ android {
         applicationId "com.ishook.inc.ychat"
         minSdkVersion 19
         targetSdkVersion androidCompileSdkVersion
-        versionCode 23
-        versionName "3.1"
+        versionCode 29
+        versionName "3.7"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     buildTypes {
         release {

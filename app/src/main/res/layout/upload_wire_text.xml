@@ -9,15 +9,16 @@
     android:layout_marginRight="4dp"
     android:layout_marginLeft="4dp"
     >
+
     <TextView
-        android:layout_marginTop="@dimen/cardview_compat_inset_shadow"
+        android:id="@+id/text_uopload"
         android:layout_width="fill_parent"
         android:layout_height="50dp"
-        android:id="@+id/text_uopload"
-        android:paddingTop="14dp"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/cardview_compat_inset_shadow"
         android:background="@drawable/edt_rounded_corner"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingTop="14dp"
         android:text="Wire something that's on your mind!"
-        android:textSize="15dp"/>
+        android:textSize="15dp" />
 
 </RelativeLayout>

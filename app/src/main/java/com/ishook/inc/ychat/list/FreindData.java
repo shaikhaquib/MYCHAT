@@ -12,4 +12,5 @@ public class FreindData {
     public String fname;
     public String Sessionid;
     public String uid;
+    public int prioty;
 }

@@ -5,7 +5,7 @@
     <item
         android:id="@+id/CreateGroup"
         android:title="Create Group"
-        android:icon="@drawable/create_group"
+        android:icon="@drawable/ic_add"
         appcompat:showAsAction="ifRoom|collapseActionView"/>
 
 </menu>

@@ -66,6 +66,7 @@ import com.ishook.inc.ychat.activitys.Search;
 import com.ishook.inc.ychat.activitys.Setting;
 import com.ishook.inc.ychat.adapters.FragmentViewPagerAdapter;
 import com.ishook.inc.ychat.adapters.UpdateCover;
+import com.ishook.inc.ychat.fragments.TabClique;
 import com.ishook.inc.ychat.fragments.TabWires;
 import com.ishook.inc.ychat.fragments.TabyChat;
 import com.ishook.inc.ychat.fragments.Update_ProfilePic;
@@ -74,12 +75,17 @@ import com.bumptech.glide.Glide;
 import com.twilio.chat.CallbackListener;
 import com.twilio.chat.Channel;
 import com.twilio.chat.ChannelDescriptor;
+import com.twilio.chat.ChatClient;
+import com.twilio.chat.ChatClientListener;
+import com.twilio.chat.ErrorInfo;
 import com.twilio.chat.Paginator;
+import com.twilio.chat.User;
 import com.twilio.chat.demo.BasicChatClient;
 import com.twilio.chat.demo.BuildConfig;
 import com.twilio.chat.demo.ChannelModel;
 import com.twilio.chat.demo.TwilioApplication;
 import com.twilio.chat.demo.activities.ChannelActivity;
+import com.twilio.chat.demo.services.CustomChannelComparator;
 import com.twilio.voice.RegistrationException;
 import com.twilio.voice.RegistrationListener;
 import com.twilio.voice.Voice;
@@ -101,12 +107,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 
 @SuppressWarnings("deprecation")
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, BasicChatClient.LoginListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, BasicChatClient.LoginListener , ChatClientListener {
 
     private List<Fragment> fragments = new ArrayList<>();
     private List<String> titles = new ArrayList<>();
@@ -115,7 +123,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static final int CONNECTION_TIMEOUT = 10000;
     public static final int READ_TIMEOUT = 15000;
 
-    private static final String TWILIO_ACCESS_TOKEN_SERVER_URL = "https://ishook.com/twilio/AccessTokenVoice.php";
     RegistrationListener registrationListener = registrationListener();
 
     String sessionid = null;
@@ -132,16 +139,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     String imgPath, fileName;
-    SearchView searchView;
-
     android.app.FragmentTransaction ft;
     ImageView updt_coverpic;
     ProgressBar updcoer_prog;
-    ImageView upd_propic;
-    TextView Username;
-    TextView Email;
     ImageView coverpic;
-    ImageView action_profile;
     ImageView profilepic;
 
     TextView noticount;
@@ -166,9 +167,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private int[] tabIcons = {
             R.drawable.ic_wire_white,
             R.drawable.ic__chat,
-/*
             R.drawable.ic_clique_icon
-*/
     };
     Toolbar searchtollbar;
     String search_suggestion;
@@ -186,11 +185,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     String newText;
 
     public static HashMap<String,ChannelModel>channels = new HashMap<>();
-    public static Map<String,ChannelModel>channelNames = new HashMap<>();
-    public static BasicChatClient basicClient;
-    private void getChannels(final BasicChatClient basicClient) {
-        channels.clear();
+    public static LinkedHashMap<String,ChannelModel>channelNames = new LinkedHashMap<>();
+    public static List<ChannelModel>groupsName = new ArrayList<>();
 
+    public static BasicChatClient basicClient = null;
+    public void getChannels(final BasicChatClient basicClient) {
+        channels.clear();
+        channelNames.clear();
         basicClient.getChatClient().getChannels().getPublicChannelsList(new CallbackListener<Paginator<ChannelDescriptor>>() {
             @Override
             public void onSuccess(Paginator<ChannelDescriptor> channelDescriptorPaginator) {
@@ -204,13 +205,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 getChannelsPage(channelDescriptorPaginator,basicClient);
             }
         });
+
+
     }
 
-    private void getChannelsPage(Paginator<ChannelDescriptor> paginator, final BasicChatClient basicClient) {
+    private  void getChannelsPage(Paginator<ChannelDescriptor> paginator, final BasicChatClient basicClient) {
         for (ChannelDescriptor cd: paginator.getItems()) {
             Log.d( "getChannelsPage: ", "Adding channel descriptor for sid|"+cd.getSid()+"| friendlyName "+ cd.getFriendlyName()+"| UniqueName "+ cd.getUniqueName());
-            channels.put(cd.getSid(), new ChannelModel(cd));
-            channelNames.put(cd.getFriendlyName(), new ChannelModel(cd));
+            if (cd.getFriendlyName().startsWith("GRP")){
+                groupsName.add( new ChannelModel(cd));
+            }else {
+                channels.put(cd.getSid(), new ChannelModel(cd));
+                channelNames.put(cd.getFriendlyName(), new ChannelModel(cd));
+            }
         }
 
         if (paginator.hasNextPage()) {
@@ -221,8 +228,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             });
         } else {
-            // Get subscribed channels last - so their status will overwrite whatever we received
-            // from public list. Ugly workaround for now.
+
             List<Channel> chans = basicClient.getChatClient().getChannels().getSubscribedChannels();
             if (chans != null) {
                 for (Channel channel : chans) {
@@ -232,12 +238,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         }
+        refreshChannelList();
+    }
+
+    private void refreshChannelList() {
+        //channels.values().stream().sorted(new CustomChannelComparator());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-      //  twillioChatLogin();
+       /* if (basicClient.getChatClient() != null){
+            getChannels(basicClient);
+        }*/
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -564,15 +577,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         fragments = new ArrayList<>();
         fragments.add(new TabWires());
         fragments.add(new TabyChat());
-/*
         fragments.add(new TabClique());
-*/
 
         titles.add("Wires");
         titles.add("ychat");
-/*
         titles.add("Clique");
-*/
 
         FragmentViewPagerAdapter adapter = new FragmentViewPagerAdapter(getSupportFragmentManager(), fragments, titles);
         viewPager.setAdapter(adapter);
@@ -588,9 +597,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         tabLayout.getTabAt(0).setCustomView(getTabView(0));
         tabLayout.getTabAt(1).setCustomView(getTabView(1));
-/*
         tabLayout.getTabAt(2).setCustomView(getTabView(2));
-*/
 
 
     }
@@ -616,7 +623,117 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         basicClient = TwilioApplication.Companion.getInstance().basicClient;
         getChannels(basicClient);
         progressDialog.dismiss();
+        Objects.requireNonNull(basicClient.getChatClient()).addListener(new ChatClientListener() {
+            @Override
+            public void onChannelJoined(Channel channel) {
+                if (channel.getFriendlyName().startsWith("GRP")){
+                    groupsName.add(new ChannelModel(channel));
+                } else {
+                    channels.put(channel.getSid(), new ChannelModel(channel));
+                    channelNames.put(channel.getFriendlyName(), new ChannelModel(channel));
+                }
+            }
 
+            @Override
+            public void onChannelInvited(Channel channel) {
+
+            }
+
+            @Override
+            public void onChannelAdded(Channel channel) {
+                if (channel.getFriendlyName().startsWith("GRP")){
+                    groupsName.add(new ChannelModel(channel));
+                } else {
+                    channels.put(channel.getSid(), new ChannelModel(channel));
+                    channelNames.put(channel.getFriendlyName(), new ChannelModel(channel));
+                }
+            }
+
+            @Override
+            public void onChannelUpdated(Channel channel, Channel.UpdateReason updateReason) {
+
+            }
+
+            @Override
+            public void onChannelDeleted(Channel channel) {
+
+            }
+
+            @Override
+            public void onChannelSynchronizationChange(Channel channel) {
+
+            }
+
+            @Override
+            public void onError(ErrorInfo errorInfo) {
+
+            }
+
+            @Override
+            public void onUserUpdated(User user, User.UpdateReason updateReason) {
+
+            }
+
+            @Override
+            public void onUserSubscribed(User user) {
+
+            }
+
+            @Override
+            public void onUserUnsubscribed(User user) {
+
+            }
+
+            @Override
+            public void onClientSynchronization(ChatClient.SynchronizationStatus synchronizationStatus) {
+
+            }
+
+            @Override
+            public void onNewMessageNotification(String s, String s1, long l) {
+
+            }
+
+            @Override
+            public void onAddedToChannelNotification(String s) {
+
+            }
+
+            @Override
+            public void onInvitedToChannelNotification(String s) {
+
+            }
+
+            @Override
+            public void onRemovedFromChannelNotification(String s) {
+
+            }
+
+            @Override
+            public void onNotificationSubscribed() {
+
+            }
+
+            @Override
+            public void onNotificationFailed(ErrorInfo errorInfo) {
+
+            }
+
+            @Override
+            public void onConnectionStateChange(ChatClient.ConnectionState connectionState) {
+
+            }
+
+            @Override
+            public void onTokenExpired() {
+
+            }
+
+            @Override
+            public void onTokenAboutToExpire() {
+
+            }
+        });
         // startActivity(new Intent(getApplicationContext(), ChannelActivity.class));
     }
 
@@ -630,6 +747,108 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onLogoutFinished() {
+
+    }
+
+    @Override
+    public void onChannelJoined(Channel channel) {
+
+    }
+
+    @Override
+    public void onChannelInvited(Channel channel) {
+
+    }
+
+    @Override
+    public void onChannelAdded(Channel channel) {
+        channels.put(channel.getSid(), new ChannelModel(channel));
+        channelNames.put(channel.getFriendlyName(), new ChannelModel(channel));
+    }
+
+    @Override
+    public void onChannelUpdated(Channel channel, Channel.UpdateReason updateReason) {
+
+    }
+
+    @Override
+    public void onChannelDeleted(Channel channel) {
+        channels.put(channel.getSid(), new ChannelModel(channel));
+        channelNames.put(channel.getFriendlyName(), new ChannelModel(channel));
+    }
+
+    @Override
+    public void onChannelSynchronizationChange(Channel channel) {
+
+    }
+
+    @Override
+    public void onError(ErrorInfo errorInfo) {
+
+    }
+
+    @Override
+    public void onUserUpdated(User user, User.UpdateReason updateReason) {
+
+    }
+
+    @Override
+    public void onUserSubscribed(User user) {
+
+    }
+
+    @Override
+    public void onUserUnsubscribed(User user) {
+
+    }
+
+    @Override
+    public void onClientSynchronization(ChatClient.SynchronizationStatus synchronizationStatus) {
+
+    }
+
+    @Override
+    public void onNewMessageNotification(String s, String s1, long l) {
+
+    }
+
+    @Override
+    public void onAddedToChannelNotification(String s) {
+
+    }
+
+    @Override
+    public void onInvitedToChannelNotification(String s) {
+
+    }
+
+    @Override
+    public void onRemovedFromChannelNotification(String s) {
+
+    }
+
+    @Override
+    public void onNotificationSubscribed() {
+
+    }
+
+    @Override
+    public void onNotificationFailed(ErrorInfo errorInfo) {
+
+    }
+
+    @Override
+    public void onConnectionStateChange(ChatClient.ConnectionState connectionState) {
+
+    }
+
+    @Override
+    public void onTokenExpired() {
+
+    }
+
+    @Override
+    public void onTokenAboutToExpire() {
 
     }
 
@@ -725,7 +944,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     UserName = jsonObject.getString("FirstName") + "_" + userid;
                     retrieveAccessToken();
-                    twillioChatLogin();
+                    if (basicClient == null) {
+                        twillioChatLogin();
+                    }
                     setTitle(jsonObject.getString("UserName"));
                     Glide.with(getApplicationContext()).load(Global.HostName + Coverpic)
                             .into(coverpic);
@@ -765,7 +986,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     UserName = object.getString("UserName") + "_" + userid;
                     retrieveAccessToken();
-                    twillioChatLogin();
+                    if (basicClient == null) {
+                        twillioChatLogin();
+                    }
 
                     SharedPreferences sharedPreferences = getSharedPreferences(getPackageName() + Constants.PREF_FILE_NAME, Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -1018,6 +1241,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
             pdLoading.dismiss();
+            basicClient.shutdown();
+            basicClient = null;
             Intent intent = new Intent(MainActivity.this, MyNotificationService.class);
             stopService(intent);
             finish();
@@ -1077,6 +1302,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Loading...");
+
+
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPreferences.edit()

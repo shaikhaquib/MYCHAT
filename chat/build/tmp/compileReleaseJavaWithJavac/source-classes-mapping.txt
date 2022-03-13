@@ -1,2 +1,0 @@
-com/twilio/chat/demo/BuildConfig.java
- com.twilio.chat.demo.BuildConfig

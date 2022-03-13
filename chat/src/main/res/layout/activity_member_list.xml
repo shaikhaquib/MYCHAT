@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#f1eeee">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_weight="1">
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/chat_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@color/darkred"
+            android:weightSum="1"
+            android:contentInsetLeft="0dp"
+            android:contentInsetStart="0dp"
+            app:contentInsetLeft="0dp"
+            app:contentInsetStart="0dp"
+            android:contentInsetRight="0dp"
+            android:contentInsetEnd="0dp"
+            app:contentInsetRight="0dp"
+            app:contentInsetEnd="0dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:src="@drawable/ic_arrow_back_white"
+                android:id="@+id/memberlist_back"
+                />
+
+
+            <TextView
+                android:id="@+id/group_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:textColor="#FFF"
+                android:textSize="18dp"
+                android:textStyle="bold" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:src="@drawable/ic_control_point"
+                    android:id="@+id/addmember"
+                    android:layout_marginRight="@dimen/activity_horizontal_margin"/>
+            </RelativeLayout>
+
+
+
+        </com.google.android.material.appbar.MaterialToolbar>
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/rvroomMember"
+            />
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ther is no User in room!\n Please add member"
+        android:layout_centerInParent="true"
+        android:textColor="#7b7777"
+        android:visibility="gone"
+        android:id="@+id/no_member"
+        android:gravity="center"
+        android:textSize="@dimen/activity_horizontal_margin"/>
+
+    <Button
+        android:id="@+id/exit_room"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
+        android:background="@drawable/btn_roundedcorner"
+        android:backgroundTint="#ffffff"
+        android:drawableLeft="@drawable/ic_exit"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:text="   Exit Group"
+        android:textAlignment="textStart"
+        android:textColor="#ff0000" />
+    <Button
+        android:id="@+id/delete_room"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/btn_roundedcorner"
+        android:backgroundTint="#FF0000"
+        android:drawableLeft="@drawable/ic_baseline_delete_24"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:text="   Delete Group"
+        android:textAlignment="textStart"
+        android:textColor="#FFFFFF" />
+
+
+</LinearLayout>

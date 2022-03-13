@@ -14,10 +14,10 @@ import com.ishook.inc.ychat.R;
  */
 
 public class YchatTabHolder extends RecyclerView.ViewHolder{
-    TextView uname;
-    TextView uid;
-    ImageView profilePic;
-    LinearLayout linearLayout;
+    public TextView uname;
+    public TextView uid;
+    public ImageView profilePic;
+    public LinearLayout linearLayout;
 
     public YchatTabHolder(View itemView) {
         super(itemView);

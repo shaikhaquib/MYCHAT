@@ -196,7 +196,7 @@ public class Friend extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+        finish();
     }
 
     private class Asyncfriendwire extends AsyncTask<String, String, String> {

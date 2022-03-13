@@ -4,6 +4,7 @@ package com.ishook.inc.ychat.adapters;
 import static com.ishook.inc.ychat.app.MainActivity.channelNames;
 import static com.ishook.inc.ychat.app.MainActivity.channels;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.androidnetworking.model.Progress;
 import com.ishook.inc.ychat.Global;
 import com.ishook.inc.ychat.R;
 import com.ishook.inc.ychat.activitys.Chat_Room;
@@ -53,7 +55,7 @@ import java.util.Random;
  * Created by Shaikh on 12-Sep-17.
  */
 
-public class ychat_adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ChatClientListener {
+public class ychat_adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final String TAG = "Ychat Adapter";
     private Context context;
     List<FreindData> mData= Collections.emptyList();
@@ -65,8 +67,7 @@ public class ychat_adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         inflater = LayoutInflater.from(context);
         this.mData = mData;
 
-        basicClient = TwilioApplication.Companion.getInstance().basicClient;
-//        basicClient.getChatClient().addListener(this);
+
     }
 
     @Override
@@ -91,7 +92,12 @@ public class ychat_adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         myViewHolder.linearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                  createPrivateChannel(current.UserName+"_"+current.UserId,current.UserName);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        createPrivateChannel(current.fname+"_"+current.UserId,current.UserName);
+                    }
+                },100);
             }
         });
 
@@ -103,16 +109,34 @@ public class ychat_adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     protected void createPrivateChannel(final String identity, final String userName) {
-        String channelFormatMain = MainActivity.UserName+"_"+identity;
-        String channelFormatAlternate= MainActivity.UserName+"_"+identity;
-        if (channelNames.containsKey(channelFormatMain)) {
+        String channelFormatMain = "CHANNEL_"+MainActivity.UserName+"_"+identity;
+        String channelFormatAlternate= "CHANNEL_"+identity+"_"+MainActivity.UserName;
+        final ProgressDialog progressDialog = new ProgressDialog(context);
+        progressDialog.setMessage("Loading Chats");
+        progressDialog.show();
 
-            Log.d(TAG, "createPrivateChannel: "+channelFormatMain);
-            ChannelModel channelModel = channelNames.get(channelFormatMain);
+        if(channelNames.containsKey(channelFormatMain) && channelNames.containsKey(channelFormatAlternate)) {
+
+            ChannelModel channelModelMain= channelNames.get(channelFormatMain);
+            channelModelMain.getChannel(new CallbackListener<Channel>() {
+                @Override
+                public void onSuccess(Channel channel) {
+                    channel.destroy(new StatusListener() {
+                        @Override
+                        public void onSuccess() {
+                        }
+                    });
+                }
+            });
+
+
+            Log.d(TAG, "createPrivateChannel: " + channelFormatAlternate);
+            ChannelModel channelModel = channelNames.get(channelFormatAlternate);
             TwilioApplication.Companion.getInstance().getBasicClient().getChatClient().getChannels().getChannel(channelModel.getSid(), new CallbackListener<Channel>() {
                 @Override
                 public void onSuccess(final Channel channel) {
-                    if (channel.getMembers().getMembersList().size() < 2){
+
+                    if (channel.getMembers().getMembersList().size() < 2) {
                         channel.getMembers().addByIdentity(identity, new StatusListener() {
                             @Override
                             public void onSuccess() {
@@ -121,13 +145,15 @@ public class ychat_adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                                 channel.getMembers().addByIdentity(MainActivity.UserName, new StatusListener() {
                                     @Override
                                     public void onSuccess() {
-                                        context.startActivity(new Intent(context, MessageActivity.class).putExtra("com.twilio.chat.Channel",channel).putExtra("C_SID", channel.getSid()).putExtra("userName", userName));
+                                        progressDialog.dismiss();
+                                        context.startActivity(new Intent(context, MessageActivity.class).putExtra("com.twilio.chat.Channel", channel).putExtra("C_SID", channel.getSid()).putExtra("userName", userName));
                                     }
 
                                     @Override
                                     public void onError(ErrorInfo errorInfo) {
                                         super.onError(errorInfo);
-                                        Log.d(TAG, "onError: "+errorInfo.getMessage());
+                                        Log.d(TAG, "onError: " + errorInfo.getMessage());
+                                        progressDialog.dismiss();
                                         Toast.makeText(context, errorInfo.getMessage(), Toast.LENGTH_SHORT).show();
 
                                     }
@@ -138,17 +164,67 @@ public class ychat_adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                             @Override
                             public void onError(ErrorInfo errorInfo) {
                                 super.onError(errorInfo);
-                                Log.d(TAG, "onError: "+errorInfo.getMessage());
-
+                                Log.d(TAG, "onError: " + errorInfo.getMessage());
+                                Toast.makeText(context, errorInfo.getMessage(), Toast.LENGTH_SHORT).show();
+                                progressDialog.dismiss();
                             }
                         });
 
+                    } else {
+                        progressDialog.dismiss();
+                        context.startActivity(new Intent(context, MessageActivity.class).putExtra("com.twilio.chat.Channel", channel).putExtra("com.twilio.chat.Channel", channel).putExtra("C_SID", channel.getSid()).putExtra("userName", userName));
                     }
-                    else
-                        context.startActivity(new Intent(context, MessageActivity.class).putExtra("com.twilio.chat.Channel",channel).putExtra("com.twilio.chat.Channel",channel).putExtra("C_SID", channel.getSid()).putExtra("userName", userName));
                 }
             });
-        }else if (channelNames.containsKey(channelFormatAlternate)) {
+        }else
+        if (channelNames.containsKey(channelFormatMain)) {
+            Log.d(TAG, "createPrivateChannel: "+channelFormatMain);
+            ChannelModel channelModel = channelNames.get(channelFormatMain);
+            TwilioApplication.Companion.getInstance().getBasicClient().getChatClient().getChannels().getChannel(channelModel.getSid(), new CallbackListener<Channel>() {
+                @Override
+                public void onSuccess(final Channel channel) {
+                    if (channel.getMembers().getMembersList().size() < 2) {
+                        channel.getMembers().addByIdentity(identity, new StatusListener() {
+                            @Override
+                            public void onSuccess() {
+                                // context.startActivity(new Intent(context, MessageActivity.class).putExtra("com.twilio.chat.Channel",channel).putExtra("C_SID", channel.getSid()).putExtra("userName", userName));
+
+                                channel.getMembers().addByIdentity(MainActivity.UserName, new StatusListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        context.startActivity(new Intent(context, MessageActivity.class).putExtra("com.twilio.chat.Channel", channel).putExtra("C_SID", channel.getSid()).putExtra("userName", userName));
+                                        progressDialog.dismiss();
+                                    }
+
+                                    @Override
+                                    public void onError(ErrorInfo errorInfo) {
+                                        super.onError(errorInfo);
+                                        Log.d(TAG, "onError: " + errorInfo.getMessage());
+                                        Toast.makeText(context, errorInfo.getMessage(), Toast.LENGTH_SHORT).show();
+                                        progressDialog.dismiss();
+
+                                    }
+                                });
+
+                            }
+
+                            @Override
+                            public void onError(ErrorInfo errorInfo) {
+                                super.onError(errorInfo);
+                                Log.d(TAG, "onError: " + errorInfo.getMessage());
+                                Toast.makeText(context, errorInfo.getMessage(), Toast.LENGTH_SHORT).show();
+                                progressDialog.dismiss();
+                            }
+                        });
+
+                    } else {
+                        context.startActivity(new Intent(context, MessageActivity.class).putExtra("com.twilio.chat.Channel", channel).putExtra("com.twilio.chat.Channel", channel).putExtra("C_SID", channel.getSid()).putExtra("userName", userName));
+                        progressDialog.dismiss();
+                    }
+                }
+            });
+        }
+        else if (channelNames.containsKey(channelFormatAlternate)) {
             Log.d(TAG, "createPrivateChannel: "+channelFormatAlternate);
             ChannelModel channelModel = channelNames.get(channelFormatAlternate);
             TwilioApplication.Companion.getInstance().getBasicClient().getChatClient().getChannels().getChannel(channelModel.getSid(), new CallbackListener<Channel>() {
@@ -164,6 +240,7 @@ public class ychat_adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                                 channel.getMembers().addByIdentity(MainActivity.UserName, new StatusListener() {
                                     @Override
                                     public void onSuccess() {
+                                        progressDialog.dismiss();
                                         context.startActivity(new Intent(context, MessageActivity.class).putExtra("com.twilio.chat.Channel",channel).putExtra("C_SID", channel.getSid()).putExtra("userName", userName));
                                     }
 
@@ -171,6 +248,7 @@ public class ychat_adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                                     public void onError(ErrorInfo errorInfo) {
                                         super.onError(errorInfo);
                                         Log.d(TAG, "onError: "+errorInfo.getMessage());
+                                        progressDialog.dismiss();
                                         Toast.makeText(context, errorInfo.getMessage(), Toast.LENGTH_SHORT).show();
 
                                     }
@@ -182,22 +260,16 @@ public class ychat_adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                             public void onError(ErrorInfo errorInfo) {
                                 super.onError(errorInfo);
                                 Log.d(TAG, "onError: "+errorInfo.getMessage());
-
+                                Toast.makeText(context, errorInfo.getMessage(), Toast.LENGTH_SHORT).show();
+                                progressDialog.dismiss();
                             }
                         });
 
                     }
-                    else
-                    context.startActivity(new Intent(context, MessageActivity.class).putExtra("com.twilio.chat.Channel",channel).putExtra("com.twilio.chat.Channel",channel).putExtra("C_SID", channel.getSid()).putExtra("userName", userName));
-                }
-            });
-        }else if (channelNames.containsKey(identity)) {
-            Log.d(TAG, "createPrivateChannel: "+identity);
-            ChannelModel channelModel = channelNames.get(identity);
-            TwilioApplication.Companion.getInstance().getBasicClient().getChatClient().getChannels().getChannel(channelModel.getSid(), new CallbackListener<Channel>() {
-                @Override
-                public void onSuccess(Channel channel) {
-                    context.startActivity(new Intent(context, MessageActivity.class).putExtra("com.twilio.chat.Channel",channel).putExtra("com.twilio.chat.Channel",channel).putExtra("C_SID", channel.getSid()).putExtra("userName", userName));
+                    else {
+                        progressDialog.dismiss();
+                        context.startActivity(new Intent(context, MessageActivity.class).putExtra("com.twilio.chat.Channel", channel).putExtra("com.twilio.chat.Channel", channel).putExtra("C_SID", channel.getSid()).putExtra("userName", userName));
+                    }
                 }
             });
         }else {
@@ -217,6 +289,7 @@ public class ychat_adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                             channel.getMembers().addByIdentity(MainActivity.UserName, new StatusListener() {
                                 @Override
                                 public void onSuccess() {
+                                    progressDialog.dismiss();
                                     context.startActivity(new Intent(context, MessageActivity.class).putExtra("com.twilio.chat.Channel",channel).putExtra("C_SID", channel.getSid()).putExtra("userName", userName));
                                 }
 
@@ -225,7 +298,7 @@ public class ychat_adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                                     super.onError(errorInfo);
                                     Log.d(TAG, "onError: "+errorInfo.getMessage());
                                     Toast.makeText(context, errorInfo.getMessage(), Toast.LENGTH_SHORT).show();
-
+                                    progressDialog.dismiss();
                                 }
                             });
 
@@ -235,7 +308,8 @@ public class ychat_adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                         public void onError(ErrorInfo errorInfo) {
                             super.onError(errorInfo);
                             Log.d(TAG, "onError: "+errorInfo.getMessage());
-
+                            Toast.makeText(context, errorInfo.getMessage(), Toast.LENGTH_SHORT).show();
+                            progressDialog.dismiss();
                         }
                     });
 
@@ -281,104 +355,5 @@ public class ychat_adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 });
     }
 
-    @Override
-    public void onChannelJoined(Channel channel) {
-        
-    }
-
-    @Override
-    public void onChannelInvited(Channel channel) {
-
-    }
-
-    @Override
-    public void onChannelAdded(Channel channel) {
-
-    }
-
-    @Override
-    public void onChannelUpdated(Channel channel, Channel.UpdateReason updateReason) {
-
-    }
-
-    @Override
-    public void onChannelDeleted(Channel channel) {
-
-    }
-
-    @Override
-    public void onChannelSynchronizationChange(Channel channel) {
-
-    }
-
-    @Override
-    public void onError(ErrorInfo errorInfo) {
-
-    }
-
-    @Override
-    public void onUserUpdated(User user, User.UpdateReason updateReason) {
-
-    }
-
-    @Override
-    public void onUserSubscribed(User user) {
-
-    }
-
-    @Override
-    public void onUserUnsubscribed(User user) {
-
-    }
-
-    @Override
-    public void onClientSynchronization(ChatClient.SynchronizationStatus synchronizationStatus) {
-
-    }
-
-    @Override
-    public void onNewMessageNotification(String s, String s1, long l) {
-
-    }
-
-    @Override
-    public void onAddedToChannelNotification(String s) {
-
-    }
-
-    @Override
-    public void onInvitedToChannelNotification(String s) {
-
-    }
-
-    @Override
-    public void onRemovedFromChannelNotification(String s) {
-
-    }
-
-    @Override
-    public void onNotificationSubscribed() {
-
-    }
-
-    @Override
-    public void onNotificationFailed(ErrorInfo errorInfo) {
-
-    }
-
-    @Override
-    public void onConnectionStateChange(ChatClient.ConnectionState connectionState) {
-
-    }
-
-    @Override
-    public void onTokenExpired() {
-
-    }
-
-    @Override
-    public void onTokenAboutToExpire() {
-
-    }
 }
 

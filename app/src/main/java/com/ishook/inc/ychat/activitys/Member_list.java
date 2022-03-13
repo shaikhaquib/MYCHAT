@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ishook.inc.ychat.Extrra.Constants;
 import com.ishook.inc.ychat.Global;
@@ -349,21 +350,15 @@ public class Member_list extends AppCompatActivity {
 
                 AlertDialog.Builder mBuilder = new AlertDialog.Builder(Member_list.this);
                 mBuilder.setTitle("Select Friends");
-                mBuilder.setMultiChoiceItems(strArrData, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
+                mBuilder.setSingleChoiceItems(strArrData, 0, new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialogInterface, int position, boolean isChecked) {
-//                        if (isChecked) {
-//                            if (!mUserItems.contains(position)) {
-//                                mUserItems.add(position);
-//                            }
-//                        } else if (mUserItems.contains(position)) {
-//                            mUserItems.remove(position);
-//                        }
-                        if(isChecked){
+                    public void onClick(DialogInterface dialog, int which) {
+                       /* if(isChecked){
                             mUserItems.add(position);
                         }else{
                             mUserItems.remove((Integer.valueOf(position)));
-                        }
+                        }*/
+                        Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_SHORT).show();
                     }
                 });
 

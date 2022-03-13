@@ -9,7 +9,6 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginRight="-16dp"
         android:layout_marginBottom="-16dp"
         android:background="@color/darkred"
         android:minHeight="?attr/actionBarSize"
@@ -25,23 +24,57 @@
                 android:id="@+id/back"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:layout_centerVertical="true"
                 android:layout_marginEnd="5dp"
                 android:layout_marginRight="5dp"
                 android:src="@drawable/ic_round_arrow_back_ios_new_24"
                 app:tint="@color/white" />
-
-            <TextView
-                android:id="@+id/toolTitle"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="10dp"
-                android:layout_marginLeft="10dp"
+                android:orientation="vertical"
+                android:layout_marginEnd="60dp"
                 android:layout_toRightOf="@+id/back"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                app:titleTextAppearance="@style/ToolbarText" />
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/toolTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:titleTextAppearance="@style/ToolbarText" />
+
+                <TextView
+                    android:id="@+id/typingIndicator"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@+id/listFooter"
+                    android:layout_alignRight="@+id/message_list_view"
+                    android:lines="1"
+                    android:text="12sp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:textStyle="italic"
+                    android:visibility="gone"
+                    android:singleLine="true" />
+
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/info"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="16dp"
+                android:src="@drawable/ic_outline_info_24"
+                app:tint="@color/white" />
 
 
         </RelativeLayout>
@@ -54,23 +87,14 @@
         android:id="@+id/message_list_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/typingIndicator"
+        android:layout_above="@+id/listFooter"
         android:layout_below="@+id/toolbar"
         android:layout_marginTop="@dimen/activity_horizontal_margin"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingBottom="@dimen/activity_vertical_margin"
         android:transcriptMode="alwaysScroll" />
 
-    <TextView
-        android:id="@+id/typingIndicator"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/listFooter"
-        android:layout_alignRight="@+id/message_list_view"
-        android:lines="1"
-        android:singleLine="true" />
 
     <LinearLayout
         android:id="@+id/listFooter"
@@ -78,24 +102,24 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:gravity="center"
-        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:background="@android:color/transparent"
+        android:orientation="horizontal"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        android:orientation="horizontal" >
+        android:paddingBottom="@dimen/activity_vertical_margin">
 
         <EditText
             android:id="@+id/messageInput"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="@drawable/roundedbox"
+            android:gravity="center_vertical"
+            android:hint="@string/type_message"
             android:inputType="textShortMessage"
             android:lines="1"
             android:padding="12dp"
-            android:gravity="center_vertical"
-            android:background="@drawable/roundedbox"
-            android:singleLine="true" 
-            android:hint="@string/type_message" />
+            android:singleLine="true" />
 
         <ImageButton
             android:id="@+id/sendButton"

@@ -11,7 +11,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-
         android:layout_centerInParent="true">
 
             <EditText
@@ -21,6 +20,8 @@
                 android:hint="Write Group name"
                 android:gravity="center"
                 android:elevation="@dimen/activity_horizontal_margin"
+                android:maxLines="1"
+                android:maxLength="40"
                 android:layout_margin="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_horizontal_margin"
                 android:paddingBottom="@dimen/activity_horizontal_margin"
@@ -34,6 +35,7 @@
                     android:background="@drawable/edt_rounded_corner"
                     android:elevation="50dp"
                     android:padding="@dimen/activity_horizontal_margin"
+                    android:textAllCaps="false"
                     android:text="Create Group" />
 
     </LinearLayout>

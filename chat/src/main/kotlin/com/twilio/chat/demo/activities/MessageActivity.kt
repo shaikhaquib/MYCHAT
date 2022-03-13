@@ -39,10 +39,13 @@ import org.jetbrains.anko.custom.ankoView
 import ChatStatusListener
 import ChatCallbackListener
 import ToastStatusListener
+import android.net.wifi.p2p.WifiP2pManager
 import android.os.Parcelable
+import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.twilio.chat.Attributes
+import com.twilio.chat.demo.BasicChatClient
 
 // RecyclerView Anko
 fun ViewManager.recyclerView() = recyclerView(theme = 0) {}
@@ -91,8 +94,20 @@ class MessageActivity : Activity(), ChannelListener, AnkoLogger {
 
             toolTitle.setText(intent.getStringExtra("userName"))
 
+            if (intent.hasExtra("group")){
+                info.visibility = View.VISIBLE
+                toolTitle.setText(intent.getStringExtra("group")!!.substring(3))
+                isGroup = true
+            }else{
+                info.visibility = View.GONE
+                isGroup = false
+            }
+
             back.setOnClickListener(){
                 finish()
+            }
+            info.setOnClickListener {
+                startActivityForResult(Intent(applicationContext,MemberList::class.java).putExtra("channel",channel),1111)
             }
 
             val basicClient = TwilioApplication.instance.basicClient
@@ -421,7 +436,7 @@ class MessageActivity : Activity(), ChannelListener, AnkoLogger {
             }
             adapter.clear()
             adapter.addItems(messageItemList)
-            adapter.notifyDataSetChanged()
+            adapter.notifyItemInserted(messageItemList.size)
         })
     }
 
@@ -503,7 +518,7 @@ class MessageActivity : Activity(), ChannelListener, AnkoLogger {
                                         "Successfully removed message. It should be GONE!!",
                                         "Error removing message") {
                                     messageItemList.remove(message)
-                                    adapter.notifyDataSetChanged()
+                                    adapter.notifyItemInserted(messageItemList.size)
                                 })
                             }
                             EDIT -> showUpdateMessageDialog(message.message)
@@ -531,8 +546,8 @@ class MessageActivity : Activity(), ChannelListener, AnkoLogger {
 
     private fun sendMessage(text: String) {
         channel!!.messages.sendMessage(Message.options().withBody(text), ChatCallbackListener<Message>() {
-            TwilioApplication.instance.showToast("Successfully sent message");
-            adapter.notifyDataSetChanged()
+            //TwilioApplication.instance.showToast("Successfully sent message");
+           // adapter.notifyItemInserted(messageItemList.size)
             messageInput.setText("")
         })
     }
@@ -550,16 +565,28 @@ class MessageActivity : Activity(), ChannelListener, AnkoLogger {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == FILE_REQUEST && resultCode == Activity.RESULT_OK) {
             debug { "Uri: ${data?.data}" }
-
             startService<MediaService>(
                 MediaService.EXTRA_ACTION to MediaService.EXTRA_ACTION_UPLOAD,
                 MediaService.EXTRA_CHANNEL to channel as Parcelable,
                 MediaService.EXTRA_MEDIA_URI to data?.data.toString())
+        }else if (requestCode == 1111 && resultCode == Activity.RESULT_OK) {
+            finish()
         }
     }
 
     override fun onMessageAdded(message: Message) {
-        setupListView(channel!!)
+       // setupListView(channel!!)
+
+      //  Toast.makeText(this, message.messageBody, Toast.LENGTH_SHORT).show()
+        Log.d("Tag", "onMessageAdded: "+message.author)
+        messageItemList.add(MessageItem(message,channel!!.members, message.author))
+        adapter.addItem( MessageItem(message,channel!!.members, message.author))
+        adapter.notifyItemInserted(messageItemList.size-1)
+        adapter.notifyItemChanged(messageItemList.size-1)
+
+        if(message.author.equals(BasicChatClient.identity)){
+            message_list_view.scrollToPosition(messageItemList.size-1)
+        }
 
         startService<MediaService>(
             MediaService.EXTRA_ACTION to MediaService.EXTRA_ACTION_DOWNLOAD,
@@ -603,9 +630,10 @@ class MessageActivity : Activity(), ChannelListener, AnkoLogger {
 
     override fun onTypingStarted(channel: Channel?, member: Member?) {
         if (member != null) {
-            val text = "${member.identity.split("_")[0]} is typing ..."
+            typingIndicator.visibility = View.VISIBLE
+            val text = "${member.identity.split("_")[0]} is typing.."
             typingIndicator.text = text
-            typingIndicator.setTextColor(Color.RED)
+            typingIndicator.setTextColor(Color.WHITE)
             debug { text }
         }
     }
@@ -613,6 +641,7 @@ class MessageActivity : Activity(), ChannelListener, AnkoLogger {
     override fun onTypingEnded(channel: Channel?, member: Member?) {
         if (member != null) {
             typingIndicator.text = null
+            typingIndicator.visibility = View.GONE
             debug { "${member.identity} finished typing" }
         }
     }
@@ -629,6 +658,7 @@ class MessageActivity : Activity(), ChannelListener, AnkoLogger {
         private val EDIT = 1
         private val GET_ATTRIBUTES = 2
         private val SET_ATTRIBUTES = 3
+        public var isGroup = false;
 
         private val EDIT_OPTIONS = listOf("Change Friendly Name", "Change Topic", "List Members", "Invite Member", "Add Member", "Remove Member", "Leave", "Destroy", "Get Attributes", "Change Unique Name", "Get Unique Name", "Get message index 0", "Set all consumed", "Set none consumed", "Disable Pushes", "Enable Pushes")
         private val NAME_CHANGE = 0

@@ -15,21 +15,9 @@
           "value": "x86_64"
         }
       ],
-      "versionCode": 3023,
-      "versionName": "3.1",
+      "versionCode": 3029,
+      "versionName": "3.7",
       "outputFile": "app-x86_64-release.apk"
-    },
-    {
-      "type": "ONE_OF_MANY",
-      "filters": [
-        {
-          "filterType": "ABI",
-          "value": "x86"
-        }
-      ],
-      "versionCode": 2023,
-      "versionName": "3.1",
-      "outputFile": "app-x86-release.apk"
     },
     {
       "type": "ONE_OF_MANY",
@@ -39,9 +27,21 @@
           "value": "armeabi-v7a"
         }
       ],
-      "versionCode": 1023,
-      "versionName": "3.1",
+      "versionCode": 1029,
+      "versionName": "3.7",
       "outputFile": "app-armeabi-v7a-release.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "x86"
+        }
+      ],
+      "versionCode": 2029,
+      "versionName": "3.7",
+      "outputFile": "app-x86-release.apk"
     },
     {
       "type": "ONE_OF_MANY",
@@ -51,8 +51,8 @@
           "value": "arm64-v8a"
         }
       ],
-      "versionCode": 4023,
-      "versionName": "3.1",
+      "versionCode": 4029,
+      "versionName": "3.7",
       "outputFile": "app-arm64-v8a-release.apk"
     }
   ]

@@ -1,51 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.twilio.chat.demo"
     android:versionCode="26">
 
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-
-    <!--<permission android:name="com.twilio.chat.demo.permission.C2D_MESSAGE" android:protectionLevel="signature" />-->
-
+    <uses-permission android:name="android.permission.WAKE_LOCK" /> <!-- <permission android:name="com.twilio.chat.demo.permission.C2D_MESSAGE" android:protectionLevel="signature" /> -->
     <uses-permission android:name="com.twilio.chat.demo.permission.C2D_MESSAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-feature android:name="android.hardware.camera"
+
+    <uses-feature
+        android:name="android.hardware.camera"
         android:required="true" />
 
-    <application
-        android:name=".TwilioApplication">
+    <application android:name=".TwilioApplication">
+        <activity
+            android:name=".activities.MemberList"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            />
         <activity
             android:name=".activities.LoginActivityChat"
-            android:label="@string/app_name">
-        </activity>
+            android:label="@string/app_name"/>
         <activity
             android:name=".activities.ChannelActivity"
-            android:label="@string/title_activity_channel" >
-        </activity>
+            android:label="@string/title_activity_channel"/>
         <activity
             android:name=".activities.MessageActivity"
             android:label="@string/title_activity_message"
-            android:launchMode="singleTop" >
-        </activity>
-
+            android:launchMode="singleTop"/>
         <activity
             android:name=".activities.UserActivity"
             android:label="@string/user_info_activity"
-            android:screenOrientation="portrait"
-            android:launchMode="singleTop" >
-        </activity>
-
-        <service android:name=".services.MediaService" android:exported="false"/>
-
-        <!-- FCM service -->
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"/>
 
         <service
-            android:name=".services.FCMListenerService">
+            android:name=".services.MediaService"
+            android:exported="false" /> <!-- FCM service -->
+        <service android:name=".services.FCMListenerService">
+
             <!-- android:exported="true" -->
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 
@@ -54,10 +52,7 @@
             android:resource="@drawable/ic_launcher" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
-            android:resource="@color/darkred" />
-
-        <!-- FCM instance ID service -->
-
+            android:resource="@color/darkred" /> <!-- FCM instance ID service -->
         <service
             android:name=".services.FCMInstanceIDService"
             android:exported="false">
@@ -66,14 +61,13 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
         <service
             android:name=".services.RegistrationIntentService"
-            android:exported="false">
-        </service>
+            android:exported="false"/>
 
-        <meta-data android:name="com.google.android.gms.version"
+        <meta-data
+            android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-
     </application>
+
 </manifest>

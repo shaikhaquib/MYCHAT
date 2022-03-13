@@ -9,6 +9,8 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -60,6 +62,22 @@ public class TabyChat extends Fragment {
     YchatTabHolder ychatTabHolder;
     LinearLayout no_friend;
     private String[] strArrData;
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (rvytab!=null && rvytab.getAdapter() != null) {
+            rvytab.getAdapter().notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (rvytab!=null && rvytab.getAdapter() != null) {
+            rvytab.getAdapter().notifyDataSetChanged();
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -222,14 +240,12 @@ public class TabyChat extends Fragment {
 
 
                     friend_list.UserId=json_data.getString("userId");
-                    Log.d("FriendName",friend_list.UserId);
                     friend_list.UserName=json_data.getString("FullName");
                     friend_list.fname=json_data.getString("UserName");
-                    Log.d("FriendName",friend_list.UserName);
                     friend_list.ProfilePic=json_data.getString("ProfilePic");
-                    Log.d("FriendName",friend_list.ProfilePic);
                     friend_list.Email=json_data.getString("Email");
-                    Log.d("FriendName",friend_list.Email);
+
+                    Log.d("Friend-userId",friend_list.fname+"_"+friend_list.UserId);
 
                     no_friend.setVisibility(View.GONE);
 

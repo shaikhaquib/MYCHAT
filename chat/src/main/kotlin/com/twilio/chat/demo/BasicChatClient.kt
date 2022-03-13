@@ -92,11 +92,11 @@ class BasicChatClient(private val context: Context)
                 && realm == this.realm
                 && url == this.urlString
                 && listener === loginListener
-                && chatClient != null) {
-            onSuccess(chatClient!!)
+                && chatClient != nu)
             return
         }
          */
+        identity = username
         assert(chatClient == null) { "ChatClient object is to be created on login, should be null before login" }
 
         this.username = username
@@ -254,4 +254,8 @@ class BasicChatClient(private val context: Context)
     override fun onNewMessageNotification(p0: String?, p1: String?, p2: Long) {}
     override fun onNotificationFailed(p0: ErrorInfo?) {}
     override fun onNotificationSubscribed() {}
+
+    companion object{
+        var identity = ""
+    }
 }

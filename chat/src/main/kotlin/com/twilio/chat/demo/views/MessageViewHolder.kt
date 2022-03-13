@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
 import android.util.Base64
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +17,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
+import com.twilio.chat.demo.BasicChatClient
 import kotterknife.bindView
 import com.twilio.chat.demo.TwilioApplication
 import com.twilio.chat.demo.activities.MessageActivity
@@ -34,20 +36,31 @@ class MessageViewHolder(val context: Context, parent: ViewGroup)
     val date: TextView by bindView(R.id.date)
     val identities: RelativeLayout by bindView(R.id.consumptionHorizonIdentities)
     val lines: LinearLayout by bindView(R.id.consumptionHorizonLines)
+    val authorLine: LinearLayout by bindView(R.id.authorLine)
 
     override fun setData(message: MessageActivity.MessageItem) {
         val msg = message.message
 
-        if(msg.author.equals(message.currentUser)){
+        Log.d("Tag", "onMessageAdded: "+message.currentUser)
+
+        if(msg.author.equals(BasicChatClient.identity)){
             bodyCurrent.visibility = View.VISIBLE
             body.visibility = View.GONE
+            authorLine.gravity = Gravity.END
+            authorLine.visibility = View.GONE
         }else{
             body.visibility = View.VISIBLE
             bodyCurrent.visibility = View.GONE
+            authorLine.gravity = Gravity.START
         }
 
 
-        author.text = msg.author
+       if(MessageActivity.isGroup)
+           authorLine.visibility = View.VISIBLE
+        else
+            authorLine.visibility = View.GONE
+
+        author.text = msg.author.split("_")[0]
         body.text = msg.messageBody
         bodyCurrent.text = msg.messageBody
         date.text = msg.dateCreated

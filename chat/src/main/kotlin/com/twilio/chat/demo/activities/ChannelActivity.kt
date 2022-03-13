@@ -28,8 +28,10 @@ import org.json.JSONObject
 import org.json.JSONException
 import ChatCallbackListener
 import ToastStatusListener
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.twilio.chat.Attributes
+import com.twilio.chat.demo.services.CustomChannelComparator
 import com.twilio.chat.demo.utils.Where.*
 import com.twilio.chat.demo.utils.simulateCrash
 
@@ -368,7 +370,7 @@ class ChannelActivity : Activity(), ChatClientListener, AnkoLogger {
     }
 
     override fun onConnectionStateChange(connectionState: ChatClient.ConnectionState) {
-        TwilioApplication.instance.showToast("Transport state changed to ${connectionState}")
+       // TwilioApplication.instance.showToast("Transport state changed to ${connectionState}")
     }
 
     override fun onTokenExpired() {
